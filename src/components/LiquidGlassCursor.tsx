@@ -801,6 +801,7 @@ export default function LiquidGlassCursor() {
         })();
 
         let lastTime = Date.now();
+        let lastVideoUpdateTime = 0;
 
         let isInitialized = false;
 
@@ -813,9 +814,19 @@ export default function LiquidGlassCursor() {
 
             // --- VIDEO SCRUBBING ---
             if (video.duration && !isNaN(video.duration)) {
-                const scrubTime = (pointers[0].x / window.innerWidth) * video.duration;
-                if (isFinite(scrubTime)) {
-                    video.currentTime = scrubTime;
+                const now = Date.now();
+                // Throttle updates to ~30fps (33ms)
+                // The user requested to prevent overwhelming the decoder.
+                if (now - lastVideoUpdateTime > 33) {
+                    const scrubTime = (pointers[0].x / window.innerWidth) * video.duration;
+                    if (isFinite(scrubTime)) {
+                        // Only update if the difference is significant to avoid tiny seeks? 
+                        // For now, just time throttling is good.
+                        if (Math.abs(video.currentTime - scrubTime) > 0.05) {
+                            video.currentTime = scrubTime;
+                            lastVideoUpdateTime = now;
+                        }
+                    }
                 }
             }
 
