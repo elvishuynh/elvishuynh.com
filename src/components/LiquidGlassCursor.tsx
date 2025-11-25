@@ -302,26 +302,41 @@ export default function LiquidGlassCursor() {
                 vec3 C = texture2D(uTexture, vUv).rgb;
 
                 float density = length(C);
+                if (density < 0.01) {
+                    gl_FragColor = vec4(0.0);
+                    return;
+                }
 
                 // Calculate normal from density gradient
                 float dx = length(R) - length(L);
                 float dy = length(T) - length(B);
                 vec3 n = normalize(vec3(dx, dy, 0.5));
 
-                // Specular (Matches original HTML: power 20.0)
+                // Specular
                 vec3 lightDir = normalize(vec3(1.0, 1.0, 2.0));
                 float spec = pow(max(dot(n, lightDir), 0.0), 20.0);
-
-                // Alpha based on specular and density (Matches original logic)
-                // Original: vec3 finalColor = bg + vec3(1.0) * spec * smoothstep(0.1, 0.3, density) * 0.5;
-                // We use the specular term for alpha to make it look like glass on top
                 
-                float alpha = spec * smoothstep(0.1, 0.3, density) * 0.5;
+                // Edge / Shadow (simulating refraction darkening)
+                float gradient = length(vec2(dx, dy));
+                float edge = smoothstep(0.0, 0.2, gradient);
                 
-                // Boost alpha slightly for visibility if needed, but keeping it subtle
-                // alpha = clamp(alpha, 0.0, 1.0);
-
-                gl_FragColor = vec4(vec3(1.0), alpha);
+                // Fluid mask
+                float mask = smoothstep(0.01, 0.1, density);
+                
+                // Final Color Composition
+                // Shadow alpha: stronger at edges
+                float shadowAlpha = edge * 0.3 * mask;
+                
+                // Specular alpha: based on spec
+                float specAlpha = spec * mask;
+                
+                // Combine:
+                // When spec is high, we want white (RGB=1).
+                // When spec is low and edge is high, we want black (RGB=0).
+                vec3 finalColor = vec3(1.0) * spec; 
+                float finalAlpha = max(shadowAlpha, specAlpha);
+                
+                gl_FragColor = vec4(finalColor, finalAlpha);
             }
         `
         );
