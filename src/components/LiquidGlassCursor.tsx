@@ -63,7 +63,7 @@ export default function LiquidGlassCursor() {
             TEXTURE_DOWNSAMPLE: 0,
             DENSITY_DISSIPATION: 0.97,
             VELOCITY_DISSIPATION: 0.98,
-            PRESSURE_DISSIPATION: 0.8,
+            PRESSURE_DISSIPATION: 0.9,
             PRESSURE_ITERATIONS: 40,
             CURL: 0,
             SPLAT_RADIUS: 0.002,
@@ -277,9 +277,45 @@ export default function LiquidGlassCursor() {
 
         // --- CSS ---
         // Ensure canvas is on top and allows clicks to pass through
-        canvas.style.zIndex = "9999";
+        // canvas.style.zIndex = "9999"; // Removed to allow className -z-10 to work
         canvas.style.pointerEvents = "none"; // Already in className, but ensuring it
 
+
+        // --- VIDEO SETUP ---
+        const video = document.createElement("video");
+        video.crossOrigin = "anonymous";
+        video.src = "https://pub-d24ed1d740a7460195197f5ee2413105.r2.dev/web_interactive_color.mp4";
+        video.loop = true;
+        video.muted = true;
+        video.preload = "auto";
+        video.playsInline = true;
+        // video.pause(); // Removed pause, let's try load() and maybe play() to buffer
+
+        let videoTexture: WebGLTexture | null = null;
+
+        video.oncanplay = () => {
+            console.log("Video can play!");
+            if (!gl) return;
+            if (!videoTexture) {
+                videoTexture = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, videoTexture);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            }
+        };
+
+        video.onerror = (e) => {
+            console.error("Video error:", e, video.error);
+        };
+
+        // Force load
+        video.load();
+        // video.play().then(() => video.pause()); // Optional: play briefly to buffer? Let's stick to load() first.
+
+        // --- SHADERS ---
+        // ... (Previous shaders remain, updating displayShader)
 
         const displayShader = compileShader(
             gl.FRAGMENT_SHADER,
@@ -292,6 +328,7 @@ export default function LiquidGlassCursor() {
             varying vec2 vT;
             varying vec2 vB;
             uniform sampler2D uTexture;
+            uniform sampler2D uBackground; // The video texture
             uniform vec2 texelSize;
 
             void main () {
@@ -302,44 +339,41 @@ export default function LiquidGlassCursor() {
                 vec3 C = texture2D(uTexture, vUv).rgb;
 
                 float density = length(C);
-                if (density < 0.01) {
-                    gl_FragColor = vec4(0.0);
-                    return;
-                }
 
-                // Calculate normal from density gradient
+                // Calculate normal
                 float dx = length(R) - length(L);
                 float dy = length(T) - length(B);
                 vec3 n = normalize(vec3(dx, dy, 0.5));
 
-                // Specular
+                // Refraction
+                vec2 refraction = n.xy * 0.05; // Strength of distortion
+                vec2 finalUV = vUv + refraction;
+                
+                // Sample Video Background (Flip Y)
+                vec2 bgUV = vec2(finalUV.x, 1.0 - finalUV.y);
+                vec3 bg = texture2D(uBackground, bgUV).rgb;
+
+                // Specular Highlight
                 vec3 lightDir = normalize(vec3(1.0, 1.0, 2.0));
                 float spec = pow(max(dot(n, lightDir), 0.0), 20.0);
-                
-                // Edge / Shadow (simulating refraction darkening)
-                float gradient = length(vec2(dx, dy));
-                float edge = smoothstep(0.0, 0.2, gradient);
-                
-                // Fluid mask
-                float mask = smoothstep(0.01, 0.1, density);
-                
-                // Final Color Composition
-                // Shadow alpha: stronger at edges
-                float shadowAlpha = edge * 0.3 * mask;
-                
-                // Specular alpha: based on spec
-                float specAlpha = spec * mask;
-                
-                // Combine:
-                // When spec is high, we want white (RGB=1).
-                // When spec is low and edge is high, we want black (RGB=0).
-                vec3 finalColor = vec3(1.0) * spec; 
-                float finalAlpha = max(shadowAlpha, specAlpha);
-                
-                gl_FragColor = vec4(finalColor, finalAlpha);
+
+                // Dynamic Highlight Color (tinted by background)
+                // We sample the background at the *refracted* coordinate to get the color "under" the glass
+                vec3 bgUnder = texture2D(uBackground, bgUV).rgb;
+                vec3 highlightTint = mix(vec3(1.0), bgUnder, 0.5); // Mix white with background color
+
+                // Combine
+                // Background + Specular
+                vec3 finalColor = bg + highlightTint * spec;
+
+                gl_FragColor = vec4(finalColor, 1.0);
             }
         `
         );
+
+        // ... (Other shaders and init logic)
+
+
 
         // ... rest of initialization ...
 
@@ -773,10 +807,25 @@ export default function LiquidGlassCursor() {
         // --- MAIN LOOP ---
         function update() {
             if (!isInitialized) return;
-            // console.log("Update loop running");
             resizeCanvas();
             const dt = Math.min((Date.now() - lastTime) / 1000, 0.016);
             lastTime = Date.now();
+
+            // --- VIDEO SCRUBBING ---
+            if (video.duration && !isNaN(video.duration)) {
+                const scrubTime = (pointers[0].x / window.innerWidth) * video.duration;
+                if (isFinite(scrubTime)) {
+                    video.currentTime = scrubTime;
+                }
+            }
+
+            // --- UPDATE VIDEO TEXTURE ---
+            if (videoTexture && video.readyState >= 2) {
+                gl.activeTexture(gl.TEXTURE0 + 8);
+                gl.bindTexture(gl.TEXTURE_2D, videoTexture);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
+            }
+
             gl.viewport(0, 0, textureWidth, textureHeight);
 
             if (splatStack.length > 0) multipleSplats(splatStack.pop()!);
@@ -908,7 +957,7 @@ export default function LiquidGlassCursor() {
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
             displayProgram.bind(gl);
             gl.uniform1i(displayProgram.uniforms.uTexture, density.read.texId);
-            gl.uniform1i(displayProgram.uniforms.uBackground, 8); // Texture unit 8
+            gl.uniform1i(displayProgram.uniforms.uBackground, 8); // Video texture unit
             gl.uniform2f(
                 displayProgram.uniforms.texelSize,
                 1.0 / textureWidth,
@@ -1039,7 +1088,7 @@ export default function LiquidGlassCursor() {
     return (
         <canvas
             ref={canvasRef}
-            className="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none"
+            className="fixed top-0 left-0 w-full h-full -z-10"
         />
     );
 }
