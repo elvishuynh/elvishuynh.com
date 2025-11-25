@@ -802,6 +802,7 @@ export default function LiquidGlassCursor() {
 
         let lastTime = Date.now();
         let lastVideoUpdateTime = 0;
+        let currentScrubTime = 0;
 
         let isInitialized = false;
 
@@ -814,19 +815,23 @@ export default function LiquidGlassCursor() {
 
             // --- VIDEO SCRUBBING ---
             if (video.duration && !isNaN(video.duration)) {
-                const now = Date.now();
-                // Throttle updates to ~30fps (33ms)
-                // The user requested to prevent overwhelming the decoder.
-                if (now - lastVideoUpdateTime > 33) {
-                    const normalizedX = pointers[0].x / window.innerWidth;
-                    const normalizedY = pointers[0].y / window.innerHeight;
-                    const progress = (normalizedX + normalizedY) / 2;
-                    const scrubTime = progress * video.duration;
-                    if (isFinite(scrubTime)) {
+                const normalizedX = pointers[0].x / window.innerWidth;
+                const normalizedY = pointers[0].y / window.innerHeight;
+                const progress = (normalizedX + normalizedY) / 2;
+                const targetScrubTime = progress * video.duration;
+
+                if (isFinite(targetScrubTime)) {
+                    // Lerp towards target
+                    currentScrubTime += (targetScrubTime - currentScrubTime) * 0.05;
+
+                    const now = Date.now();
+                    // Throttle updates to ~30fps (33ms)
+                    // The user requested to prevent overwhelming the decoder.
+                    if (now - lastVideoUpdateTime > 33) {
                         // Only update if the difference is significant to avoid tiny seeks? 
                         // For now, just time throttling is good.
-                        if (Math.abs(video.currentTime - scrubTime) > 0.05) {
-                            video.currentTime = scrubTime;
+                        if (Math.abs(video.currentTime - currentScrubTime) > 0.05) {
+                            video.currentTime = currentScrubTime;
                             lastVideoUpdateTime = now;
                         }
                     }
