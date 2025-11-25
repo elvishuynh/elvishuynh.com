@@ -330,6 +330,8 @@ export default function LiquidGlassCursor() {
             uniform sampler2D uTexture;
             uniform sampler2D uBackground; // The video texture
             uniform vec2 texelSize;
+            uniform float screenAspect;
+            uniform float videoAspect;
 
             void main () {
                 vec3 L = texture2D(uTexture, vL).rgb;
@@ -349,8 +351,65 @@ export default function LiquidGlassCursor() {
                 vec2 refraction = n.xy * 0.05; // Strength of distortion
                 vec2 finalUV = vUv + refraction;
                 
-                // Sample Video Background (Flip Y)
-                vec2 bgUV = vec2(finalUV.x, 1.0 - finalUV.y);
+                // Sample Video Background (Flip Y) with Object-Fit: Cover
+                // Calculate scale to cover
+                float screenRatio = screenAspect;
+                float videoRatio = videoAspect;
+                
+                // We want to map UV (0..1) to a centered crop of the video
+                // If screen is wider than video (screenRatio > videoRatio), we crop top/bottom
+                // If screen is taller than video (screenRatio < videoRatio), we crop left/right
+                
+                vec2 bgUV = vec2(finalUV.x, 1.0 - finalUV.y); // Flip Y first
+                
+                float scale = max(screenRatio / videoRatio, 1.0);
+                // Wait, let's derive the math properly.
+                // We want to transform UV space.
+                // Center is (0.5, 0.5).
+                // uv -= 0.5
+                // uv *= scale_factor
+                // uv += 0.5
+                
+                vec2 ratio = vec2(
+                    min((screenRatio / videoRatio), 1.0),
+                    min((videoRatio / screenRatio), 1.0)
+                );
+                
+                // This is tricky. Let's do standard cover math.
+                // s = screen, v = video
+                // if s > v (screen wider), we match width, scale height.
+                // scale = s / v.
+                // new_height_uv = uv.y * scale - (scale - 1.0) * 0.5
+                
+                vec2 uv = bgUV - 0.5;
+                
+                // If screen is wider than video (screenRatio > videoRatio)
+                // We need to "zoom in" on Y (make Y range smaller in texture space? No, we need to sample a smaller portion of the texture?)
+                // Actually, if screen is wider, we show the full width of the video, but only a middle strip of the height.
+                // So UV.x goes 0..1. UV.y goes from (0.5 - something) to (0.5 + something).
+                
+                float aspectCorrection = screenRatio / videoRatio;
+                
+                if (aspectCorrection > 1.0) {
+                    // Screen is wider than video.
+                    // We match the width (keep X 1:1) and crop the height.
+                    // To crop height (zoom in), we need to sample a smaller range of Y.
+                    // So we multiply UV.y by a factor < 1.
+                    // aspectCorrection is > 1 (e.g. 2.0).
+                    // So we divide by aspectCorrection.
+                    uv.y /= aspectCorrection;
+                } else {
+                    // Screen is taller than video.
+                    // We match the height (keep Y 1:1) and crop the width.
+                    // To crop width (zoom in), we need to sample a smaller range of X.
+                    // So we multiply UV.x by a factor < 1.
+                    // aspectCorrection is < 1 (e.g. 0.5).
+                    // So we multiply by aspectCorrection.
+                    uv.x *= aspectCorrection;
+                }
+                
+                bgUV = uv + 0.5;
+                
                 vec3 bg = texture2D(uBackground, bgUV).rgb;
 
                 // Specular Highlight
@@ -982,6 +1041,10 @@ export default function LiquidGlassCursor() {
                 1.0 / textureWidth,
                 1.0 / textureHeight
             );
+            gl.uniform1f(displayProgram.uniforms.screenAspect, canvas!.width / canvas!.height);
+            const vW = video.videoWidth || 1;
+            const vH = video.videoHeight || 1;
+            gl.uniform1f(displayProgram.uniforms.videoAspect, vW / vH);
             blit(null);
 
             requestAnimationFrame(update);
