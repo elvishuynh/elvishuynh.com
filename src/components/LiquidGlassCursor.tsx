@@ -818,7 +818,10 @@ export default function LiquidGlassCursor() {
                 // Throttle updates to ~30fps (33ms)
                 // The user requested to prevent overwhelming the decoder.
                 if (now - lastVideoUpdateTime > 33) {
-                    const scrubTime = (pointers[0].x / window.innerWidth) * video.duration;
+                    const normalizedX = pointers[0].x / window.innerWidth;
+                    const normalizedY = pointers[0].y / window.innerHeight;
+                    const progress = (normalizedX + normalizedY) / 2;
+                    const scrubTime = progress * video.duration;
                     if (isFinite(scrubTime)) {
                         // Only update if the difference is significant to avoid tiny seeks? 
                         // For now, just time throttling is good.
