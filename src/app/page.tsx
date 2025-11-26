@@ -1,10 +1,13 @@
 import Dashboard from "@/components/Dashboard";
+import ScrollManager from "@/components/ScrollManager";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between relative">
+      <ScrollManager />
+
       {/* Hero Section - Transparent to show LiquidGlassCursor */}
-      <section className="h-screen w-full flex flex-col items-center justify-center relative z-10 pointer-events-none">
+      <section id="hero" className="h-screen w-full flex flex-col items-center justify-center relative z-10 pointer-events-none">
         <div className="text-center space-y-4 pointer-events-auto">
           <h1 className="text-7xl md:text-9xl font-bold text-white tracking-tighter mix-blend-overlay opacity-90">
             ELVIS
@@ -22,7 +25,9 @@ export default function Home() {
       </section>
 
       {/* Dashboard Section */}
-      <Dashboard />
+      <div id="dashboard" className="w-full relative z-20 bg-black">
+        <Dashboard />
+      </div>
     </main>
   );
 }
