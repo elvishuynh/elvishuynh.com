@@ -864,10 +864,56 @@ export default function LiquidGlassCursor() {
         let currentScrubTime = 0;
 
         let isInitialized = false;
+        let isPaused = false;
+
+        // --- SCROLL OPTIMIZATION ---
+        const handleScroll = () => {
+            // Pause if we've scrolled past the viewport (Hero section)
+            // Adding a small buffer (100px) to ensure it doesn't pause prematurely if partially visible
+            const shouldPause = window.scrollY > window.innerHeight + 100;
+
+            if (shouldPause !== isPaused) {
+                isPaused = shouldPause;
+                if (isPaused) {
+                    video.pause();
+                } else {
+                    // Only play if we are not scrubbing manually? 
+                    // The original code didn't play the video, it just loaded it.
+                    // But if we want it to be "live" we might need to ensure it's ready.
+                    // Actually, the original code had `video.loop = true` and `video.muted = true` but commented out `video.play()`.
+                    // It seems it relies on `video.currentTime` updates or just static frame?
+                    // Wait, the original code:
+                    // video.src = "..."; video.loop = true; ... video.load();
+                    // And in update(): if (videoTexture && video.readyState >= 2) ... texImage2D ...
+                    // It doesn't seem to be playing automatically?
+                    // Ah, `video.play()` was commented out: `// video.pause(); // Removed pause...`
+                    // But `video.load()` is called.
+                    // If the video is not playing, `texImage2D` just updates the texture with the current frame.
+                    // If the intention is a moving video background, it SHOULD be playing.
+                    // Let's assume it should be playing or at least we shouldn't break existing behavior.
+                    // If it WAS playing, we pause it. If it wasn't, we don't need to play it.
+                    // However, to save resources, we definitely want to pause it if it IS playing.
+
+                    // Safe approach: just pause if paused. If unpaused, let the loop handle texture updates.
+                    // If the video was playing, we might want to resume.
+                    video.play().catch(() => { });
+                }
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+
 
         // --- MAIN LOOP ---
         function update() {
             if (!isInitialized) return;
+
+            // Optimization: Skip rendering if paused (scrolled out of view)
+            if (isPaused) {
+                requestAnimationFrame(update);
+                return;
+            }
+
             resizeCanvas();
             const dt = Math.min((Date.now() - lastTime) / 1000, 0.016);
             lastTime = Date.now();
@@ -1164,6 +1210,7 @@ export default function LiquidGlassCursor() {
             window.removeEventListener("touchmove", handleTouchMove);
             window.removeEventListener("mousedown", handleMouseDown);
             window.removeEventListener("mouseup", handleMouseUp);
+            window.removeEventListener("scroll", handleScroll);
         };
     }, []);
 
