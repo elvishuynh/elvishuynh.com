@@ -51,7 +51,11 @@ export default function RootLayout({
       >
         <LiquidGlassCursor />
         <Navbar />
-        {children}
+        <div id="smooth-wrapper">
+          <div id="smooth-content">
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );
