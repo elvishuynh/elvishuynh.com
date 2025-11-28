@@ -12,7 +12,7 @@ export default function Home() {
           <h1 className="text-7xl md:text-9xl font-bold text-white tracking-tighter mix-blend-overlay opacity-90">
             ELVIS
           </h1>
-          <p className="text-xl md:text-2xl text-white/70 font-light tracking-widest uppercase">
+          <p className="text-xl md:text-2xl text-white/70 font-light tracking-widest uppercase font-serif italic">
             Digital Experience
           </p>
         </div>
