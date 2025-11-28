@@ -26,6 +26,17 @@ const FlippableActivityCard = () => {
                 ease: "back.out(1.5)", // Heavy spring
                 overwrite: true
             });
+
+            // Fog Effect: Animate glass panel opacity/color
+            // Fog Effect: Animate glass panel opacity/color
+            gsap.to(".glass-panel", {
+                duration: 0.4,
+                backgroundColor: "rgba(255, 255, 255, 0.6)", // Fog up to 60% white
+                backdropFilter: "blur(4px)", // Add blur
+                yoyo: true,
+                repeat: 1,
+                ease: "power1.inOut"
+            });
         });
     };
 
@@ -49,9 +60,18 @@ const FlippableActivityCard = () => {
                         transformStyle: 'preserve-3d'
                     }}
                 >
+                    {/* Layer A: Glass Panel (Fog Effect) - Plane B */}
+                    <div
+                        className="glass-panel absolute left-1/2 top-1/2 w-[85%] h-[85%] rounded-2xl pointer-events-none z-10 border border-white/20"
+                        style={{
+                            transform: 'translate3d(-50%, -50%, 40px)', // Center + The Void (Gap)
+                            backgroundColor: "rgba(255,255,255,0)", // Start fully transparent
+                            backdropFilter: "blur(0px)"
+                        }}
+                    />
                     {/* Layer B: The Floating Content */}
                     <div
-                        className="layer-content absolute inset-0 p-8 flex flex-col pointer-events-none"
+                        className="layer-content absolute inset-0 p-8 flex flex-col pointer-events-none z-20"
                         style={{ transform: 'translateZ(80px)' }}
                     >
                         {/* Hero Element: Neon Tesseract */}
@@ -85,6 +105,15 @@ const FlippableActivityCard = () => {
                         transformStyle: 'preserve-3d'
                     }}
                 >
+                    {/* Layer A: Glass Panel (Fog Effect) - Plane B */}
+                    <div
+                        className="glass-panel absolute inset-0 rounded-3xl pointer-events-none z-10 border border-white/20"
+                        style={{
+                            transform: 'translateZ(40px)', // The Void (Gap)
+                            backgroundColor: "rgba(255,255,255,0.1)",
+                            backdropFilter: "blur(0px)"
+                        }}
+                    />
                     {/* Layer B: The Floating Content */}
                     <div
                         className="layer-content absolute inset-0 p-8 flex flex-col pointer-events-none"
