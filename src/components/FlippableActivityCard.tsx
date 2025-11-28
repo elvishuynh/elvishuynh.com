@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
-import Cube3D from './Cube3D';
+import Tesseract3D from './Tesseract3D';
 
 const FlippableActivityCard = () => {
     const cardRef = useRef<HTMLDivElement>(null);
@@ -56,9 +56,9 @@ const FlippableActivityCard = () => {
                         className="layer-content absolute inset-0 p-8 flex flex-col pointer-events-none"
                         style={{ transform: 'translateZ(80px)' }}
                     >
-                        {/* Hero Element: Neon Cube */}
+                        {/* Hero Element: Neon Tesseract */}
                         <div className="flex-1 flex items-center justify-center">
-                            <Cube3D />
+                            <Tesseract3D />
                         </div>
 
                         {/* Text Content */}
