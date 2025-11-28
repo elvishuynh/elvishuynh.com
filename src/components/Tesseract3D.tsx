@@ -51,8 +51,8 @@ const Tesseract3D = () => {
 
             // Neon gradient stroke
             const gradient = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-            gradient.addColorStop(0, 'rgba(0, 255, 255, 0.8)'); // Cyan
-            gradient.addColorStop(1, 'rgba(255, 0, 255, 0.8)'); // Magenta
+            gradient.addColorStop(0, '#ff5315'); // Orange-Red
+            gradient.addColorStop(1, '#ffa300'); // Amber
 
             ctx.strokeStyle = gradient;
             ctx.lineWidth = 1.5;
@@ -149,7 +149,7 @@ const Tesseract3D = () => {
     return (
         <div className="relative w-[80px] h-[80px] flex items-center justify-center">
             {/* Glow Effect */}
-            <div className="absolute inset-0 bg-cyan-500/10 blur-xl rounded-full animate-pulse"></div>
+            <div className="absolute inset-0 bg-[#ff5315]/20 blur-xl rounded-full animate-pulse"></div>
             <canvas ref={canvasRef} width={120} height={120} className="relative z-10" />
         </div>
     );
