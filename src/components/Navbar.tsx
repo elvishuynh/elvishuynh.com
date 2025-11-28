@@ -12,7 +12,7 @@ export default function Navbar() {
                 <div className="flex justify-between items-center h-16">
                     {/* Brand */}
                     <div className="flex-shrink-0 flex items-center">
-                        <Link href="#" className="text-2xl font-bold tracking-tighter hover:opacity-80 transition-opacity">
+                        <Link href="#" className="text-2xl font-bold tracking-tighter hover:text-highlight transition-colors">
                             K-SHIFT
                         </Link>
                     </div>

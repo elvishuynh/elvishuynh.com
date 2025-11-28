@@ -2,12 +2,14 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #e8e6df;
+  --highlight: #ff5f15;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-highlight: var(--highlight);
   --font-sans: var(--font-satoshi);
   --font-serif: var(--font-erode);
   --font-mono: monospace;
