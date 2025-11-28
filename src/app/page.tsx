@@ -25,7 +25,7 @@ export default function Home() {
       </section>
 
       {/* Dashboard Section */}
-      <div id="dashboard" className="w-full relative z-20 bg-black">
+      <div id="dashboard" className="w-full relative z-20">
         <Dashboard />
       </div>
     </main>

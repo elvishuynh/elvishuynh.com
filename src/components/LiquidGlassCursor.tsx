@@ -52,6 +52,7 @@ class GLProgram {
 
 export default function LiquidGlassCursor() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const overlayRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -312,7 +313,7 @@ export default function LiquidGlassCursor() {
 
         // Force load
         video.load();
-        // video.play().then(() => video.pause()); // Optional: play briefly to buffer? Let's stick to load() first.
+        video.pause(); // Ensure it's paused so scrubbing controls it
 
         // --- SHADERS ---
         // ... (Previous shaders remain, updating displayShader)
@@ -864,40 +865,37 @@ export default function LiquidGlassCursor() {
         let currentScrubTime = 0;
 
         let isInitialized = false;
-        let isPaused = false;
+        let isFrozen = false;
 
         // --- SCROLL OPTIMIZATION ---
         const handleScroll = () => {
-            // Pause if we've scrolled past the viewport (Hero section)
-            // Adding a small buffer (100px) to ensure it doesn't pause prematurely if partially visible
-            const shouldPause = window.scrollY > window.innerHeight + 100;
+            const scrollY = window.scrollY;
+            const windowHeight = window.innerHeight;
 
-            if (shouldPause !== isPaused) {
-                isPaused = shouldPause;
-                if (isPaused) {
-                    video.pause();
-                } else {
-                    // Only play if we are not scrubbing manually? 
-                    // The original code didn't play the video, it just loaded it.
-                    // But if we want it to be "live" we might need to ensure it's ready.
-                    // Actually, the original code had `video.loop = true` and `video.muted = true` but commented out `video.play()`.
-                    // It seems it relies on `video.currentTime` updates or just static frame?
-                    // Wait, the original code:
-                    // video.src = "..."; video.loop = true; ... video.load();
-                    // And in update(): if (videoTexture && video.readyState >= 2) ... texImage2D ...
-                    // It doesn't seem to be playing automatically?
-                    // Ah, `video.play()` was commented out: `// video.pause(); // Removed pause...`
-                    // But `video.load()` is called.
-                    // If the video is not playing, `texImage2D` just updates the texture with the current frame.
-                    // If the intention is a moving video background, it SHOULD be playing.
-                    // Let's assume it should be playing or at least we shouldn't break existing behavior.
-                    // If it WAS playing, we pause it. If it wasn't, we don't need to play it.
-                    // However, to save resources, we definitely want to pause it if it IS playing.
+            // 1. Gradual Blur & Darkening
+            // Blur from 0px to 30px as we scroll from 0 to windowHeight
+            const progress = Math.min(scrollY / windowHeight, 1.0);
+            const blurAmount = progress * 30;
 
-                    // Safe approach: just pause if paused. If unpaused, let the loop handle texture updates.
-                    // If the video was playing, we might want to resume.
-                    video.play().catch(() => { });
+            if (canvas) {
+                canvas.style.filter = `blur(${blurAmount}px)`;
+            }
+
+            // Darken the overlay from 0 to 0.6 opacity
+            if (overlayRef.current) {
+                overlayRef.current.style.opacity = (progress * 0.6).toString();
+            }
+
+            // 2. "Let Go" Freeze Logic
+            // Freeze only when the dashboard is almost fully visible (e.g. 95% scrolled)
+            const shouldFreeze = scrollY > windowHeight - 50;
+
+            if (shouldFreeze !== isFrozen) {
+                isFrozen = shouldFreeze;
+                if (isFrozen) {
+                    resetSimulation();
                 }
+                // No need to play/pause video as it is driven by scrubbing (currentTime)
             }
         };
 
@@ -908,175 +906,183 @@ export default function LiquidGlassCursor() {
         function update() {
             if (!isInitialized) return;
 
-            // Optimization: Skip rendering if paused (scrolled out of view)
-            if (isPaused) {
-                requestAnimationFrame(update);
-                return;
-            }
+            // Removed isPaused check to allow rendering frozen state
+
 
             resizeCanvas();
             const dt = Math.min((Date.now() - lastTime) / 1000, 0.016);
             lastTime = Date.now();
 
-            // --- VIDEO SCRUBBING ---
-            if (video.duration && !isNaN(video.duration)) {
-                const normalizedX = pointers[0].x / window.innerWidth;
-                const normalizedY = pointers[0].y / window.innerHeight;
-                const progress = (normalizedX + normalizedY) / 2;
-                const targetScrubTime = progress * video.duration;
+            // --- VIDEO SCRUBBING & SIMULATION ---
+            if (!isFrozen) {
+                // --- VIDEO SCRUBBING ---
+                if (video.duration && !isNaN(video.duration)) {
+                    const normalizedX = pointers[0].x / window.innerWidth;
+                    const normalizedY = pointers[0].y / window.innerHeight;
+                    const progress = (normalizedX + normalizedY) / 2;
+                    const targetScrubTime = progress * video.duration;
 
-                if (isFinite(targetScrubTime)) {
-                    // Lerp towards target
-                    currentScrubTime += (targetScrubTime - currentScrubTime) * 0.05;
+                    if (isFinite(targetScrubTime)) {
+                        // Lerp towards target
+                        currentScrubTime += (targetScrubTime - currentScrubTime) * 0.05;
 
-                    const now = Date.now();
-                    // Throttle updates to ~30fps (33ms)
-                    // The user requested to prevent overwhelming the decoder.
-                    if (now - lastVideoUpdateTime > 33) {
-                        // Only update if the difference is significant to avoid tiny seeks? 
-                        // For now, just time throttling is good.
-                        if (Math.abs(video.currentTime - currentScrubTime) > 0.05) {
-                            video.currentTime = currentScrubTime;
-                            lastVideoUpdateTime = now;
+                        const now = Date.now();
+                        // Throttle updates to ~30fps (33ms)
+                        // The user requested to prevent overwhelming the decoder.
+                        if (now - lastVideoUpdateTime > 33) {
+                            // Only update if the difference is significant to avoid tiny seeks? 
+                            // For now, just time throttling is good.
+                            if (Math.abs(video.currentTime - currentScrubTime) > 0.05) {
+                                video.currentTime = currentScrubTime;
+                                lastVideoUpdateTime = now;
+                            }
                         }
                     }
                 }
-            }
 
-            // --- UPDATE VIDEO TEXTURE ---
-            if (videoTexture && video.readyState >= 2) {
-                gl.activeTexture(gl.TEXTURE0 + 8);
-                gl.bindTexture(gl.TEXTURE_2D, videoTexture);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
-            }
-
-            gl.viewport(0, 0, textureWidth, textureHeight);
-
-            if (splatStack.length > 0) multipleSplats(splatStack.pop()!);
-
-            for (let i = 0; i < pointers.length; i++) {
-                const pointer = pointers[i];
-                if (pointer.moved) {
-                    pointer.dx = (pointer.x - pointer.prevX) * 12.0;
-                    pointer.dy = (pointer.y - pointer.prevY) * 12.0;
-                    const dx = pointer.x - pointer.prevX;
-                    const dy = pointer.y - pointer.prevY;
-                    const len = Math.sqrt(dx * dx + dy * dy);
-                    const steps = Math.ceil(len / 5.0);
-                    if (steps > 0) {
-                        for (let j = 0; j < steps; j++) {
-                            const t = j / steps;
-                            const x = pointer.prevX + dx * t;
-                            const y = pointer.prevY + dy * t;
-                            splat(x, y, pointer.dx, pointer.dy, pointer.color);
-                        }
-                    }
-                    pointer.prevX = pointer.x;
-                    pointer.prevY = pointer.y;
-                    pointer.moved = false;
-                } else {
-                    pointer.prevX = pointer.x;
-                    pointer.prevY = pointer.y;
+                // --- UPDATE VIDEO TEXTURE ---
+                if (videoTexture && video.readyState >= 2) {
+                    gl.activeTexture(gl.TEXTURE0 + 8);
+                    gl.bindTexture(gl.TEXTURE_2D, videoTexture);
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
                 }
-            }
 
-            curlProgram.bind(gl);
-            gl.uniform2f(
-                curlProgram.uniforms.texelSize,
-                1.0 / textureWidth,
-                1.0 / textureHeight
-            );
-            gl.uniform1i(curlProgram.uniforms.uVelocity, velocity.read.texId);
-            blit(curl.fbo);
+                gl.viewport(0, 0, textureWidth, textureHeight);
 
-            vorticityProgram.bind(gl);
-            gl.uniform2f(
-                vorticityProgram.uniforms.texelSize,
-                1.0 / textureWidth,
-                1.0 / textureHeight
-            );
-            gl.uniform1i(vorticityProgram.uniforms.uVelocity, velocity.read.texId);
-            gl.uniform1i(vorticityProgram.uniforms.uCurl, curl.texId);
-            gl.uniform1f(vorticityProgram.uniforms.curl, config.CURL);
-            gl.uniform1f(vorticityProgram.uniforms.dt, dt);
-            blit(velocity.write.fbo);
-            velocity.swap();
+                if (splatStack.length > 0) multipleSplats(splatStack.pop()!);
 
-            divergenceProgram.bind(gl);
-            gl.uniform2f(
-                divergenceProgram.uniforms.texelSize,
-                1.0 / textureWidth,
-                1.0 / textureHeight
-            );
-            gl.uniform1i(divergenceProgram.uniforms.uVelocity, velocity.read.texId);
-            blit(divergence.fbo);
+                for (let i = 0; i < pointers.length; i++) {
+                    const pointer = pointers[i];
+                    if (pointer.moved) {
+                        pointer.dx = (pointer.x - pointer.prevX) * 12.0;
+                        pointer.dy = (pointer.y - pointer.prevY) * 12.0;
+                        const dx = pointer.x - pointer.prevX;
+                        const dy = pointer.y - pointer.prevY;
+                        const len = Math.sqrt(dx * dx + dy * dy);
+                        const steps = Math.ceil(len / 5.0);
+                        if (steps > 0) {
+                            for (let j = 0; j < steps; j++) {
+                                const t = j / steps;
+                                const x = pointer.prevX + dx * t;
+                                const y = pointer.prevY + dy * t;
+                                splat(x, y, pointer.dx, pointer.dy, pointer.color);
+                            }
+                        }
+                        pointer.prevX = pointer.x;
+                        pointer.prevY = pointer.y;
+                        pointer.moved = false;
+                    } else {
+                        pointer.prevX = pointer.x;
+                        pointer.prevY = pointer.y;
+                    }
+                }
 
-            clearProgram.bind(gl);
-            let pressureTexId = pressure.read.texId;
-            gl.activeTexture(gl.TEXTURE0 + pressureTexId);
-            gl.bindTexture(gl.TEXTURE_2D, pressure.read.texture);
-            gl.uniform1i(clearProgram.uniforms.uTexture, pressureTexId);
-            gl.uniform1f(clearProgram.uniforms.value, config.PRESSURE_DISSIPATION);
-            blit(pressure.write.fbo);
-            pressure.swap();
+                curlProgram.bind(gl);
+                gl.uniform2f(
+                    curlProgram.uniforms.texelSize,
+                    1.0 / textureWidth,
+                    1.0 / textureHeight
+                );
+                gl.uniform1i(curlProgram.uniforms.uVelocity, velocity.read.texId);
+                blit(curl.fbo);
 
-            pressureProgram.bind(gl);
-            gl.uniform2f(
-                pressureProgram.uniforms.texelSize,
-                1.0 / textureWidth,
-                1.0 / textureHeight
-            );
-            gl.uniform1i(pressureProgram.uniforms.uDivergence, divergence.texId);
-            pressureTexId = pressure.read.texId;
-            gl.uniform1i(pressureProgram.uniforms.uPressure, pressureTexId);
-            gl.activeTexture(gl.TEXTURE0 + pressureTexId);
-            for (let i = 0; i < config.PRESSURE_ITERATIONS; i++) {
+                vorticityProgram.bind(gl);
+                gl.uniform2f(
+                    vorticityProgram.uniforms.texelSize,
+                    1.0 / textureWidth,
+                    1.0 / textureHeight
+                );
+                gl.uniform1i(vorticityProgram.uniforms.uVelocity, velocity.read.texId);
+                gl.uniform1i(vorticityProgram.uniforms.uCurl, curl.texId);
+                gl.uniform1f(vorticityProgram.uniforms.curl, config.CURL);
+                gl.uniform1f(vorticityProgram.uniforms.dt, dt);
+                blit(velocity.write.fbo);
+                velocity.swap();
+
+                divergenceProgram.bind(gl);
+                gl.uniform2f(
+                    divergenceProgram.uniforms.texelSize,
+                    1.0 / textureWidth,
+                    1.0 / textureHeight
+                );
+                gl.uniform1i(divergenceProgram.uniforms.uVelocity, velocity.read.texId);
+                blit(divergence.fbo);
+
+                clearProgram.bind(gl);
+                let pressureTexId = pressure.read.texId;
+                gl.activeTexture(gl.TEXTURE0 + pressureTexId);
                 gl.bindTexture(gl.TEXTURE_2D, pressure.read.texture);
+                gl.uniform1i(clearProgram.uniforms.uTexture, pressureTexId);
+                gl.uniform1f(clearProgram.uniforms.value, config.PRESSURE_DISSIPATION);
                 blit(pressure.write.fbo);
                 pressure.swap();
+
+                pressureProgram.bind(gl);
+                gl.uniform2f(
+                    pressureProgram.uniforms.texelSize,
+                    1.0 / textureWidth,
+                    1.0 / textureHeight
+                );
+                gl.uniform1i(pressureProgram.uniforms.uDivergence, divergence.texId);
+                pressureTexId = pressure.read.texId;
+                gl.uniform1i(pressureProgram.uniforms.uPressure, pressureTexId);
+                gl.activeTexture(gl.TEXTURE0 + pressureTexId);
+                for (let i = 0; i < config.PRESSURE_ITERATIONS; i++) {
+                    gl.bindTexture(gl.TEXTURE_2D, pressure.read.texture);
+                    blit(pressure.write.fbo);
+                    pressure.swap();
+                }
+
+                gradienSubtractProgram.bind(gl);
+                gl.uniform2f(
+                    gradienSubtractProgram.uniforms.texelSize,
+                    1.0 / textureWidth,
+                    1.0 / textureHeight
+                );
+                gl.uniform1i(
+                    gradienSubtractProgram.uniforms.uPressure,
+                    pressure.read.texId
+                );
+                gl.uniform1i(
+                    gradienSubtractProgram.uniforms.uVelocity,
+                    velocity.read.texId
+                );
+                blit(velocity.write.fbo);
+                velocity.swap();
+
+                advectionProgram.bind(gl);
+                gl.uniform2f(
+                    advectionProgram.uniforms.texelSize,
+                    1.0 / textureWidth,
+                    1.0 / textureHeight
+                );
+                gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read.texId);
+                gl.uniform1i(advectionProgram.uniforms.uSource, velocity.read.texId);
+                gl.uniform1f(advectionProgram.uniforms.dt, dt);
+                gl.uniform1f(
+                    advectionProgram.uniforms.dissipation,
+                    config.VELOCITY_DISSIPATION
+                );
+                blit(velocity.write.fbo);
+                velocity.swap();
+
+                gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read.texId);
+                gl.uniform1i(advectionProgram.uniforms.uSource, density.read.texId);
+                gl.uniform1f(
+                    advectionProgram.uniforms.dissipation,
+                    config.DENSITY_DISSIPATION
+                );
+                blit(density.write.fbo);
+                density.swap();
+
+            } else {
+                // Even if frozen, ensure the video texture is bound to unit 8
+                // This prevents flickering if the texture unit was overwritten (e.g. by resizeCanvas)
+                if (videoTexture) {
+                    gl.activeTexture(gl.TEXTURE0 + 8);
+                    gl.bindTexture(gl.TEXTURE_2D, videoTexture);
+                }
             }
-
-            gradienSubtractProgram.bind(gl);
-            gl.uniform2f(
-                gradienSubtractProgram.uniforms.texelSize,
-                1.0 / textureWidth,
-                1.0 / textureHeight
-            );
-            gl.uniform1i(
-                gradienSubtractProgram.uniforms.uPressure,
-                pressure.read.texId
-            );
-            gl.uniform1i(
-                gradienSubtractProgram.uniforms.uVelocity,
-                velocity.read.texId
-            );
-            blit(velocity.write.fbo);
-            velocity.swap();
-
-            advectionProgram.bind(gl);
-            gl.uniform2f(
-                advectionProgram.uniforms.texelSize,
-                1.0 / textureWidth,
-                1.0 / textureHeight
-            );
-            gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read.texId);
-            gl.uniform1i(advectionProgram.uniforms.uSource, velocity.read.texId);
-            gl.uniform1f(advectionProgram.uniforms.dt, dt);
-            gl.uniform1f(
-                advectionProgram.uniforms.dissipation,
-                config.VELOCITY_DISSIPATION
-            );
-            blit(velocity.write.fbo);
-            velocity.swap();
-
-            gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read.texId);
-            gl.uniform1i(advectionProgram.uniforms.uSource, density.read.texId);
-            gl.uniform1f(
-                advectionProgram.uniforms.dissipation,
-                config.DENSITY_DISSIPATION
-            );
-            blit(density.write.fbo);
-            density.swap();
 
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
             displayProgram.bind(gl);
@@ -1158,6 +1164,30 @@ export default function LiquidGlassCursor() {
             }
         }
 
+        function resetSimulation() {
+            if (!gl) return;
+
+            // Clear all FBOs to black/transparent
+            const fbos = [
+                density.read.fbo, density.write.fbo,
+                velocity.read.fbo, velocity.write.fbo,
+                divergence.fbo,
+                curl.fbo,
+                pressure.read.fbo, pressure.write.fbo
+            ];
+
+            fbos.forEach(fbo => {
+                gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+            });
+
+            // Reset pointers
+            pointers.forEach(p => {
+                p.moved = false;
+                p.down = false;
+            });
+        }
+
         // --- EVENT LISTENERS ---
         const handleMouseMove = (e: MouseEvent) => {
             // In original HTML: pointers[0].moved = pointers[0].down;
@@ -1215,9 +1245,16 @@ export default function LiquidGlassCursor() {
     }, []);
 
     return (
-        <canvas
-            ref={canvasRef}
-            className="fixed top-0 left-0 w-full h-full -z-10"
-        />
+        <>
+            <canvas
+                ref={canvasRef}
+                className="fixed top-0 left-0 w-full h-full -z-10"
+            />
+            <div
+                ref={overlayRef}
+                className="fixed top-0 left-0 w-full h-full bg-black pointer-events-none -z-10 transition-opacity duration-0"
+                style={{ opacity: 0 }}
+            />
+        </>
     );
 }
