@@ -1,4 +1,5 @@
 import React from 'react';
+import FlippableActivityCard from './FlippableActivityCard';
 
 const Dashboard = () => {
     return (
@@ -79,30 +80,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* Activity Feed */}
-                    <div className="col-span-1 row-span-2 group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10">
-                        <h3 className="text-xl font-bold text-white mb-6">Recent Activity</h3>
-                        <div className="space-y-6">
-                            {[
-                                { user: 'Alice M.', action: 'Uploaded a new asset', time: '2m ago', color: 'bg-blue-500' },
-                                { user: 'Bob D.', action: 'Commented on Project X', time: '15m ago', color: 'bg-green-500' },
-                                { user: 'Charlie', action: 'Started a new session', time: '1h ago', color: 'bg-purple-500' },
-                                { user: 'Diana P.', action: 'Updated profile settings', time: '3h ago', color: 'bg-yellow-500' },
-                                { user: 'Evan R.', action: 'Deployed to production', time: '5h ago', color: 'bg-red-500' },
-                            ].map((item, i) => (
-                                <div key={i} className="flex items-center gap-4">
-                                    <div className={`w-2 h-2 rounded-full ${item.color} shadow-[0_0_10px_currentColor]`}></div>
-                                    <div className="flex-1">
-                                        <p className="text-sm text-white font-medium">{item.user}</p>
-                                        <p className="text-xs text-white/50">{item.action}</p>
-                                    </div>
-                                    <span className="text-xs text-white/30">{item.time}</span>
-                                </div>
-                            ))}
-                        </div>
-                        <button className="w-full mt-8 py-3 rounded-xl bg-white/10 text-white text-sm font-medium hover:bg-white/20 transition-colors border border-white/5">
-                            View All Activity
-                        </button>
-                    </div>
+                    <FlippableActivityCard />
 
                 </div>
             </div>
