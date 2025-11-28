@@ -1,17 +1,37 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import LiquidGlassCursor from "@/components/LiquidGlassCursor";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const satoshi = localFont({
+  src: [
+    {
+      path: "../fonts/Satoshi-Variable.woff2",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Satoshi-VariableItalic.woff2",
+      style: "italic",
+    },
+  ],
+  variable: "--font-satoshi",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const erode = localFont({
+  src: [
+    {
+      path: "../fonts/Erode-Variable.woff2",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Erode-VariableItalic.woff2",
+      style: "italic",
+    },
+  ],
+  variable: "--font-erode",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -27,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${satoshi.variable} ${erode.variable} antialiased font-sans`}
       >
         <LiquidGlassCursor />
         <Navbar />
