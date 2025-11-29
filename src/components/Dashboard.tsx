@@ -19,35 +19,47 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                     {/* Stat Card 1 */}
-                    <div className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20">
+                    <div className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20 flex flex-col justify-between min-h-[200px]">
                         <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-purple-500/20 blur-2xl transition-all duration-500 group-hover:bg-purple-500/40"></div>
-                        <h3 className="text-sm font-medium text-purple-300 uppercase tracking-wider mb-2 font-serif">Total Views</h3>
-                        <p className="text-4xl font-bold text-white mb-4">274,069</p>
-                        <div className="flex items-center text-sm text-green-400">
+
+                        <div>
+                            <h3 className="text-sm font-medium text-purple-300 uppercase tracking-wider mb-1 font-serif">Total Views</h3>
+                            <p className="text-4xl font-bold text-white tracking-tight">274,069</p>
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm text-green-400 mt-6">
+                            <span className="text-white/40 font-serif italic">Colossus Bread</span>
                             <span className="bg-green-400/10 px-2 py-1 rounded-full">+48%</span>
-                            <span className="ml-2 text-white/40 font-serif italic">Colossus Bread</span>
                         </div>
                     </div>
 
                     {/* Stat Card 2 */}
-                    <div className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20">
+                    <div className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20 flex flex-col justify-between min-h-[200px]">
                         <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-blue-500/20 blur-2xl transition-all duration-500 group-hover:bg-blue-500/40"></div>
-                        <h3 className="text-sm font-medium text-blue-300 uppercase tracking-wider mb-2 font-serif">Followers</h3>
-                        <p className="text-4xl font-bold text-white mb-4">6,291</p>
-                        <div className="flex items-center text-sm text-green-400">
+
+                        <div>
+                            <h3 className="text-sm font-medium text-blue-300 uppercase tracking-wider mb-1 font-serif">Followers</h3>
+                            <p className="text-4xl font-bold text-white tracking-tight">6,291</p>
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm text-green-400 mt-6">
+                            <span className="text-white/40 font-serif italic">Jawny's</span>
                             <span className="bg-green-400/10 px-2 py-1 rounded-full">+72%</span>
-                            <span className="ml-2 text-white/40 font-serif italic">Jawny's</span>
                         </div>
                     </div>
 
                     {/* Stat Card 3 */}
-                    <div className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-pink-500/20">
+                    <div className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-pink-500/20 flex flex-col justify-between min-h-[200px]">
                         <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-pink-500/20 blur-2xl transition-all duration-500 group-hover:bg-pink-500/40"></div>
-                        <h3 className="text-sm font-medium text-pink-300 uppercase tracking-wider mb-2 font-serif">Reach</h3>
-                        <p className="text-4xl font-bold text-white mb-4">85,182</p>
-                        <div className="flex items-center text-sm text-green-400">
+
+                        <div>
+                            <h3 className="text-sm font-medium text-pink-300 uppercase tracking-wider mb-1 font-serif">Reach</h3>
+                            <p className="text-4xl font-bold text-white tracking-tight">85,182</p>
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm text-green-400 mt-6">
+                            <span className="text-white/40 font-serif italic">Panacea Regenerative</span>
                             <span className="bg-green-400/10 px-2 py-1 rounded-full">+69%</span>
-                            <span className="ml-2 text-white/40 font-serif italic">Panacea Regenerative</span>
                         </div>
                     </div>
 
