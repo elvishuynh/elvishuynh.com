@@ -1,5 +1,206 @@
-import React from 'react';
+'use client';
+
+import { useMemo, useCallback } from 'react';
 import FlippableActivityCard from './FlippableActivityCard';
+import { AreaClosed, LinePath, Bar } from '@visx/shape';
+import { curveMonotoneX } from '@visx/curve';
+import { scaleTime, scaleLinear } from '@visx/scale';
+import { withTooltip, TooltipWithBounds, defaultStyles } from '@visx/tooltip';
+import { localPoint } from '@visx/event';
+import { LinearGradient } from '@visx/gradient';
+import { max, extent, bisector } from 'd3-array';
+import { timeFormat } from 'd3-time-format';
+import { ParentSize } from '@visx/responsive';
+import { analyticsData } from '../data/analyticsData';
+
+// Accessors
+const getDate = (d: { date: string }) => new Date(d.date);
+const getPrimary = (d: { primary: number }) => d.primary;
+const getSecondary = (d: { secondary: number }) => d.secondary;
+const bisectDate = bisector<{ date: string }, Date>((d) => new Date(d.date)).left;
+
+const chartData = analyticsData;
+
+type TooltipData = {
+    date: Date;
+    primary: number;
+    secondary: number;
+};
+
+const AnalyticsChart = withTooltip<
+    { width: number; height: number },
+    TooltipData
+>(({ width, height, showTooltip, hideTooltip, tooltipData, tooltipTop = 0, tooltipLeft = 0 }) => {
+    if (width < 10) return null;
+
+    // Bounds
+    const margin = { top: 20, right: 0, bottom: 0, left: 0 };
+    const xMax = width - margin.left - margin.right;
+    const yMax = height - margin.top - margin.bottom;
+
+    // Scales
+    const xScale = useMemo(
+        () =>
+            scaleTime({
+                range: [0, xMax],
+                domain: extent(chartData, getDate) as [Date, Date],
+            }),
+        [xMax]
+    );
+
+    const yScale = useMemo(
+        () =>
+            scaleLinear({
+                range: [yMax, 0],
+                domain: [0, (max(chartData, (d) => Math.max(d.primary, d.secondary)) || 0) * 1.2],
+                nice: true,
+            }),
+        [yMax]
+    );
+
+    // Tooltip handler
+    const handleTooltip = useCallback(
+        (event: React.TouchEvent<SVGRectElement> | React.MouseEvent<SVGRectElement>) => {
+            const { x } = localPoint(event) || { x: 0 };
+            const x0 = xScale.invert(x);
+            const index = bisectDate(chartData, x0, 1);
+            const d0 = chartData[index - 1];
+            const d1 = chartData[index];
+            let d = d0;
+            if (d1 && getDate(d1)) {
+                d = x0.valueOf() - getDate(d0).valueOf() > getDate(d1).valueOf() - x0.valueOf() ? d1 : d0;
+            }
+
+            showTooltip({
+                tooltipData: {
+                    date: getDate(d),
+                    primary: getPrimary(d),
+                    secondary: getSecondary(d),
+                },
+                tooltipLeft: x,
+                tooltipTop: yScale(getPrimary(d)),
+            });
+        },
+        [showTooltip, yScale, xScale]
+    );
+
+    return (
+        <div className="relative">
+            <svg width={width} height={height}>
+                <LinearGradient id="area-gradient" from="#a855f7" to="#a855f7" fromOpacity={0.4} toOpacity={0} />
+                <LinearGradient id="line-gradient" from="#a855f7" to="#ec4899" />
+
+                {/* Secondary Data (Before) */}
+                <AreaClosed
+                    data={chartData}
+                    x={(d) => xScale(getDate(d)) ?? 0}
+                    y={(d) => yScale(getSecondary(d)) ?? 0}
+                    yScale={yScale}
+                    strokeWidth={0}
+                    curve={curveMonotoneX}
+                    fill="#94a3b8"
+                    fillOpacity={0.1}
+                />
+                <LinePath
+                    data={chartData}
+                    x={(d) => xScale(getDate(d)) ?? 0}
+                    y={(d) => yScale(getSecondary(d)) ?? 0}
+                    stroke="#94a3b8"
+                    strokeWidth={1}
+                    strokeOpacity={0.3}
+                    curve={curveMonotoneX}
+                    strokeDasharray="4,4"
+                />
+
+                {/* Primary Data (After) */}
+                <AreaClosed
+                    data={chartData}
+                    x={(d) => xScale(getDate(d)) ?? 0}
+                    y={(d) => yScale(getPrimary(d)) ?? 0}
+                    yScale={yScale}
+                    strokeWidth={0}
+                    curve={curveMonotoneX}
+                    fill="url(#area-gradient)"
+                />
+                <LinePath
+                    data={chartData}
+                    x={(d) => xScale(getDate(d)) ?? 0}
+                    y={(d) => yScale(getPrimary(d)) ?? 0}
+                    stroke="url(#line-gradient)"
+                    strokeWidth={2}
+                    curve={curveMonotoneX}
+                />
+
+                <Bar
+                    x={0}
+                    y={0}
+                    width={width}
+                    height={height}
+                    fill="transparent"
+                    rx={14}
+                    onTouchStart={handleTooltip}
+                    onTouchMove={handleTooltip}
+                    onMouseMove={handleTooltip}
+                    onMouseLeave={() => hideTooltip()}
+                />
+
+                {tooltipData && (
+                    <g>
+                        <circle
+                            cx={tooltipLeft}
+                            cy={tooltipTop}
+                            r={4}
+                            fill="#a855f7"
+                            stroke="#fff"
+                            strokeWidth={2}
+                            pointerEvents="none"
+                        />
+                        <circle
+                            cx={tooltipLeft}
+                            cy={tooltipTop}
+                            r={4}
+                            fill="#a855f7"
+                            stroke="#fff"
+                            strokeWidth={2}
+                            pointerEvents="none"
+                            className="animate-ping opacity-75"
+                        />
+                    </g>
+                )}
+            </svg>
+
+            {tooltipData && (
+                <TooltipWithBounds
+                    key={Math.random()}
+                    top={tooltipTop - 12}
+                    left={tooltipLeft + 12}
+                    style={{
+                        ...defaultStyles,
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        backdropFilter: 'blur(10px)',
+                        color: 'white',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    }}
+                >
+                    <div className="font-serif text-xs text-white/60 mb-1">
+                        {timeFormat('%b %d, %Y')(tooltipData.date)}
+                    </div>
+                    <div className="text-sm font-bold text-white mb-1">
+                        {tooltipData.primary.toLocaleString()} Views
+                    </div>
+                    {tooltipData.secondary > 0 && (
+                        <div className="text-xs text-white/40">
+                            vs {tooltipData.secondary.toLocaleString()} (Prev)
+                        </div>
+                    )}
+                </TooltipWithBounds>
+            )}
+        </div>
+    );
+});
 
 const Dashboard = () => {
     return (
@@ -74,20 +275,11 @@ const Dashboard = () => {
                             </select>
                         </div>
 
-                        {/* Fake Graph Bars */}
-                        <div className="flex items-end justify-between h-64 gap-2">
-                            {[40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 50, 95].map((height, i) => (
-                                <div key={i} className="w-full bg-white/5 rounded-t-lg relative overflow-hidden group-hover:bg-white/10 transition-all duration-500">
-                                    <div
-                                        style={{ height: `${height}%` }}
-                                        className={`absolute bottom-0 w-full rounded-t-lg bg-gradient-to-t from-white/10 to-white/40 transition-all duration-1000 ease-out delay-[${i * 50}ms] group-hover:to-white/60`}
-                                    ></div>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="flex justify-between mt-4 text-xs text-white/40 uppercase tracking-wider font-serif">
-                            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-                            <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+                        {/* Visx Chart */}
+                        <div className="h-64 w-full">
+                            <ParentSize>
+                                {({ width, height }) => <AnalyticsChart width={width} height={height} />}
+                            </ParentSize>
                         </div>
                     </div>
 
