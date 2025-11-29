@@ -23,7 +23,7 @@ const FlippableActivityCard = () => {
             gsap.to(cardRef.current, {
                 rotationY: nextState ? 180 : 0,
                 duration: 0.8,
-                ease: "back.out(1.5)", // Heavy spring
+                ease: "back.inOut(1.5)", // Heavy spring
                 overwrite: true
             });
 
