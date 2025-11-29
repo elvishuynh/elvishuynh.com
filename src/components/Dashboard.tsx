@@ -87,8 +87,8 @@ const AnalyticsChart = withTooltip<
     return (
         <div className="relative">
             <svg width={width} height={height}>
-                <LinearGradient id="area-gradient" from="#a855f7" to="#a855f7" fromOpacity={0.4} toOpacity={0} />
-                <LinearGradient id="line-gradient" from="#a855f7" to="#ec4899" />
+                <LinearGradient id="area-gradient" from="#ff5315" to="#ff5315" fromOpacity={0.4} toOpacity={0} />
+                <LinearGradient id="line-gradient" from="#ff5315" to="#ffa300" />
 
                 {/* Secondary Data (Before) */}
                 <AreaClosed
@@ -159,7 +159,7 @@ const AnalyticsChart = withTooltip<
                             cx={tooltipLeft}
                             cy={tooltipTop}
                             r={4}
-                            fill="#a855f7"
+                            fill="#ff5315"
                             stroke="#fff"
                             strokeWidth={2}
                             pointerEvents="none"
@@ -265,18 +265,23 @@ const Dashboard = () => {
                     </div>
 
                     {/* Large Card - Graph Placeholder */}
-                    <div className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10">
-                        <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-xl font-bold text-white">Analytics Overview</h3>
-                            <select className="bg-white/5 border border-white/10 rounded-lg px-3 py-1 text-sm text-white/80 outline-none focus:border-white/30 font-serif">
-                                <option>Last 7 Days</option>
-                                <option>Last 30 Days</option>
-                                <option>Last Year</option>
-                            </select>
+                    {/* Large Card - Graph Placeholder */}
+                    <div className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10 hover:scale-[1.01] hover:shadow-2xl hover:shadow-orange-500/20 flex flex-col justify-between min-h-[400px]">
+                        <div className="absolute top-0 right-0 -mt-4 -mr-4 h-32 w-32 rounded-full bg-orange-500/20 blur-3xl transition-all duration-500 group-hover:bg-orange-500/40"></div>
+
+                        <div className="flex justify-between items-start mb-6 relative z-10">
+                            <div>
+                                <h3 className="text-sm font-medium text-orange-300 uppercase tracking-wider mb-1 font-serif">Total Views</h3>
+                                <p className="text-4xl font-bold text-white tracking-tight">1.2M</p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <span className="text-white/40 font-serif italic text-sm">vs. Previous Period</span>
+                                <span className="bg-green-400/10 text-green-400 px-2 py-1 rounded-full text-sm font-medium">+115%</span>
+                            </div>
                         </div>
 
                         {/* Visx Chart */}
-                        <div className="h-64 w-full">
+                        <div className="h-64 w-full relative z-10">
                             <ParentSize>
                                 {({ width, height }) => <AnalyticsChart width={width} height={height} />}
                             </ParentSize>
