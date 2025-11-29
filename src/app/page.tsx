@@ -8,13 +8,19 @@ export default function Home() {
 
       {/* Hero Section - Transparent to show LiquidGlassCursor */}
       <section id="hero" className="h-screen w-full flex flex-col items-center justify-center relative z-10 pointer-events-none">
-        <div className="text-center space-y-4 pointer-events-auto">
-          <h1 className="text-7xl md:text-9xl font-bold text-white tracking-tighter mix-blend-overlay opacity-90">
-            ELVIS
-          </h1>
-          <p className="text-xl md:text-2xl text-highlight font-light tracking-widest uppercase font-serif italic">
-            Digital Experience
-          </p>
+        <div className="w-full max-w-[90rem] px-8 md:px-24 flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 pointer-events-auto">
+          <div className="text-left">
+            <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tighter mix-blend-overlay opacity-90 whitespace-nowrap">
+              Elvis Huynh
+            </h1>
+          </div>
+          <div className="text-left max-w-sm flex items-center">
+            <p className="text-sm md:text-base text-white/90 font-serif font-light leading-relaxed">
+              Crafting digital experiences that merge creativity with technology.
+              Exploring the boundaries of interactive design and fluid user interfaces.
+              Building the future of web interactions one pixel at a time.
+            </p>
+          </div>
         </div>
 
         <div className="absolute bottom-12 animate-bounce text-white/50">
