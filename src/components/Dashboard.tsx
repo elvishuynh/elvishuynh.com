@@ -11,7 +11,7 @@ const Dashboard = () => {
                         Dashboard
                     </h2>
                     <p className="text-lg text-white/60 font-serif italic">
-                        Overview of your creative performance.
+                        A snapshot of how K-SHIFT has influenced client insights in the first month of working together.
                     </p>
                 </div>
 
@@ -22,32 +22,32 @@ const Dashboard = () => {
                     <div className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20">
                         <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-purple-500/20 blur-2xl transition-all duration-500 group-hover:bg-purple-500/40"></div>
                         <h3 className="text-sm font-medium text-purple-300 uppercase tracking-wider mb-2 font-serif">Total Views</h3>
-                        <p className="text-4xl font-bold text-white mb-4">2.4M</p>
+                        <p className="text-4xl font-bold text-white mb-4">274,069</p>
                         <div className="flex items-center text-sm text-green-400">
-                            <span className="bg-green-400/10 px-2 py-1 rounded-full">+12.5%</span>
-                            <span className="ml-2 text-white/40 font-serif italic">vs last month</span>
+                            <span className="bg-green-400/10 px-2 py-1 rounded-full">+48%</span>
+                            <span className="ml-2 text-white/40 font-serif italic">Colossus Bread</span>
                         </div>
                     </div>
 
                     {/* Stat Card 2 */}
                     <div className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20">
                         <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-blue-500/20 blur-2xl transition-all duration-500 group-hover:bg-blue-500/40"></div>
-                        <h3 className="text-sm font-medium text-blue-300 uppercase tracking-wider mb-2 font-serif">Engagement</h3>
-                        <p className="text-4xl font-bold text-white mb-4">84%</p>
+                        <h3 className="text-sm font-medium text-blue-300 uppercase tracking-wider mb-2 font-serif">Followers</h3>
+                        <p className="text-4xl font-bold text-white mb-4">6,291</p>
                         <div className="flex items-center text-sm text-green-400">
-                            <span className="bg-green-400/10 px-2 py-1 rounded-full">+5.2%</span>
-                            <span className="ml-2 text-white/40 font-serif italic">vs last month</span>
+                            <span className="bg-green-400/10 px-2 py-1 rounded-full">+72%</span>
+                            <span className="ml-2 text-white/40 font-serif italic">Jawny's</span>
                         </div>
                     </div>
 
                     {/* Stat Card 3 */}
                     <div className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-pink-500/20">
                         <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-pink-500/20 blur-2xl transition-all duration-500 group-hover:bg-pink-500/40"></div>
-                        <h3 className="text-sm font-medium text-pink-300 uppercase tracking-wider mb-2 font-serif">Active Users</h3>
-                        <p className="text-4xl font-bold text-white mb-4">12.8K</p>
-                        <div className="flex items-center text-sm text-red-400">
-                            <span className="bg-red-400/10 px-2 py-1 rounded-full">-2.1%</span>
-                            <span className="ml-2 text-white/40 font-serif italic">vs last month</span>
+                        <h3 className="text-sm font-medium text-pink-300 uppercase tracking-wider mb-2 font-serif">Reach</h3>
+                        <p className="text-4xl font-bold text-white mb-4">85,182</p>
+                        <div className="flex items-center text-sm text-green-400">
+                            <span className="bg-green-400/10 px-2 py-1 rounded-full">+69%</span>
+                            <span className="ml-2 text-white/40 font-serif italic">Panacea Regenerative</span>
                         </div>
                     </div>
 
