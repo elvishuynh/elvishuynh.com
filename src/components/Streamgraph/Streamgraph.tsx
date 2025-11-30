@@ -8,7 +8,9 @@ import { Stack } from '@visx/shape';
 import { PatternCircles, PatternWaves } from '@visx/pattern';
 import { scaleLinear, scaleOrdinal } from '@visx/scale';
 import { transpose } from '@visx/vendor/d3-array';
-import { animated, useSpring, config } from '@react-spring/web';
+import { animated, useSpring } from '@react-spring/web';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import generateData from './generateData';
 
@@ -23,13 +25,7 @@ const range = (n: number) => Array.from(new Array(n), (_, i) => i);
 
 const keys = range(NUM_LAYERS);
 
-// scales
-const xScale = scaleLinear<number>({
-    domain: [0, SAMPLES_PER_LAYER - 1],
-});
-const yScale = scaleLinear<number>({
-    domain: [-30, 50],
-});
+// scales (domains are constant, ranges depend on width/height)
 const colorScale = scaleOrdinal<number, string>({
     domain: keys,
     range: ['#ffc409', '#f14702', '#262d97', 'white', '#036ecd', '#9ecadd', '#51666e'],
@@ -39,11 +35,6 @@ const patternScale = scaleOrdinal<number, string>({
     range: ['mustard', 'cherry', 'navy', 'circles', 'circles', 'circles', 'circles'],
 });
 
-// accessors
-type Datum = number[];
-const getY0 = (d: Datum) => yScale(d[0]) ?? 0;
-const getY1 = (d: Datum) => yScale(d[1]) ?? 0;
-
 export type StreamGraphProps = {
     width: number;
     height: number;
@@ -51,47 +42,121 @@ export type StreamGraphProps = {
     loop?: boolean;
     showControls?: boolean;
     id?: string;
+    enableScrollInteraction?: boolean;
 };
 
-export default function Streamgraph({ width, height, text = "Reveal", loop = false, showControls = true, id = "streamgraph" }: StreamGraphProps) {
+// Sub-component for individual layers to handle animation hooks correctly
+const StreamgraphLayer = ({ pathString, color, patternUrl }: { pathString: string, color: string, patternUrl: string }) => {
+    const isFirstRender = React.useRef(true);
+
+    useEffect(() => {
+        isFirstRender.current = false;
+    }, []);
+
+    const { d } = useSpring({
+        d: pathString,
+        config: { duration: 800 },
+        immediate: isFirstRender.current,
+    });
+
+    return (
+        <g>
+            <animated.path d={d} fill={color} />
+            <animated.path d={d} fill={patternUrl} />
+        </g>
+    );
+};
+
+export default function Streamgraph({
+    width,
+    height,
+    text = "Reveal",
+    loop = false,
+    showControls = true,
+    id = "streamgraph",
+    enableScrollInteraction = false
+}: StreamGraphProps) {
     const [tick, setTick] = useState(0);
+
+    // Create scales inside component to avoid shared state issues
+    const xScale = useMemo(() => scaleLinear<number>({
+        domain: [0, SAMPLES_PER_LAYER - 1],
+        range: [0, width]
+    }), [width]);
+
+    const yScale = useMemo(() => scaleLinear<number>({
+        domain: [-30, 50],
+        range: [height, 0]
+    }), [height]);
+
+    // Accessors
+    const getY0 = (d: number[]) => yScale(d[0]) ?? 0;
+    const getY1 = (d: number[]) => yScale(d[1]) ?? 0;
 
     // Animation loop
     useEffect(() => {
-        const interval = setInterval(() => {
-            setTick((t) => {
-                if (!loop && t >= 7) {
-                    clearInterval(interval);
-                    return t;
-                }
-                return t + 1;
-            });
-        }, 800);
+        if (enableScrollInteraction) {
+            gsap.registerPlugin(ScrollTrigger);
 
-        return () => clearInterval(interval);
-    }, [tick, loop]);
+            const trigger = ScrollTrigger.create({
+                trigger: "body",
+                start: "top top",
+                end: "bottom bottom",
+                onUpdate: (self) => {
+                    // Change shape every 200px of scroll
+                    const newTick = Math.floor(self.scroll() / 200);
+                    setTick(prev => {
+                        if (prev !== newTick) return newTick;
+                        return prev;
+                    });
+                }
+            });
+
+            return () => trigger.kill();
+        } else {
+            const interval = setInterval(() => {
+                setTick((t) => {
+                    if (!loop && t >= 7) {
+                        clearInterval(interval);
+                        return t;
+                    }
+                    return t + 1;
+                });
+            }, 800);
+
+            return () => clearInterval(interval);
+        }
+    }, [loop, enableScrollInteraction]);
 
     // Calculate multiplier based on tick
     const multiplier = useMemo(() => {
-        if (loop) return 1.0;
+        if (enableScrollInteraction || loop) return 1.0;
         if (tick < 4) return 1.0;
         if (tick === 4) return 0.6;
         if (tick === 5) return 0.3;
         if (tick === 6) return 0.1;
         return 0.0;
-    }, [tick, loop]);
+    }, [tick, loop, enableScrollInteraction]);
+
+    // Generate a pool of data to make animations deterministic and reversible
+    const dataPool = useMemo(() => {
+        return range(50).map(() =>
+            keys.map(() => generateData(SAMPLES_PER_LAYER, BUMPS_PER_LAYER))
+        );
+    }, []);
 
     // Generate data based on tick/multiplier
     const layers = useMemo(() => {
-        if (tick >= 7) {
+        if (!enableScrollInteraction && !loop && tick >= 7) {
             // Flat line
             return transpose<number>(
                 keys.map(() => new Array(SAMPLES_PER_LAYER).fill(0))
             );
         }
 
-        // Generate random data and scale it
-        const rawLayers = keys.map(() => generateData(SAMPLES_PER_LAYER, BUMPS_PER_LAYER));
+        // Select data from pool based on tick
+        // This ensures that scrolling to the same position always yields the same shape
+        const rawLayers = dataPool[tick % dataPool.length];
 
         // Apply multiplier
         const scaledLayers = rawLayers.map(layer =>
@@ -99,12 +164,9 @@ export default function Streamgraph({ width, height, text = "Reveal", loop = fal
         );
 
         return transpose<number>(scaledLayers);
-    }, [tick, multiplier]);
+    }, [tick, multiplier, enableScrollInteraction, loop, dataPool]);
 
     if (width < 10) return null;
-
-    xScale.range([0, width]);
-    yScale.range([height, 0]);
 
     return (
         <div className="relative w-full h-full overflow-hidden rounded-xl">
@@ -157,18 +219,13 @@ export default function Streamgraph({ width, height, text = "Reveal", loop = fal
                                 const patternName = patternScale(stack.key);
                                 const patternUrl = `url(#${id}-${patternName})`;
 
-                                // Interpolate path string
-                                const { d } = useSpring({
-                                    d: pathString,
-                                    config: { duration: 800 }, // Match interval for continuous flow
-                                    immediate: tick === 0, // No animation on initial render
-                                });
-
                                 return (
-                                    <g key={`series-${stack.key}`}>
-                                        <animated.path d={d} fill={color} />
-                                        <animated.path d={d} fill={patternUrl} />
-                                    </g>
+                                    <StreamgraphLayer
+                                        key={`series-${stack.key}`}
+                                        pathString={pathString}
+                                        color={color}
+                                        patternUrl={patternUrl}
+                                    />
                                 );
                             })
                         }

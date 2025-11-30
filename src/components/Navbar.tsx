@@ -18,7 +18,7 @@ export default function Navbar() {
                             K-SHIFT
                         </Link>
                         <div className="w-[100px] h-[40px] -mt-2">
-                            <Streamgraph width={100} height={40} loop={true} showControls={false} id="navbar-streamgraph" />
+                            <Streamgraph width={100} height={40} showControls={false} id="navbar-streamgraph" enableScrollInteraction={true} />
                         </div>
                     </div>
 
