@@ -138,7 +138,7 @@ export default function Streamgraph({ width, height, text = "Reveal" }: StreamGr
                     <Stack<number[], number>
                         data={layers}
                         keys={keys}
-                        offset="wiggle"
+                        offset="silhouette"
                         color={colorScale}
                         x={(_, i) => xScale(i) ?? 0}
                         y0={getY0}
@@ -154,6 +154,7 @@ export default function Streamgraph({ width, height, text = "Reveal" }: StreamGr
                                 const { d } = useSpring({
                                     d: pathString,
                                     config: { duration: 800 }, // Match interval for continuous flow
+                                    immediate: tick === 0, // No animation on initial render
                                 });
 
                                 return (
