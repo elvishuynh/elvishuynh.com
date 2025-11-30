@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback } from 'react';
 import FlippableActivityCard from './FlippableActivityCard';
-import Streamgraph from './Streamgraph/Streamgraph';
+
 import { AreaClosed, LinePath, Bar } from '@visx/shape';
 import { curveMonotoneX } from '@visx/curve';
 import { scaleTime, scaleLinear } from '@visx/scale';
@@ -292,24 +292,7 @@ const Dashboard = () => {
                     {/* Activity Feed */}
                     <FlippableActivityCard />
 
-                    {/* Streamgraph Card */}
-                    <div className="col-span-1 md:col-span-2 lg:col-span-3 group relative overflow-hidden rounded-3xl bg-white/5 p-8 backdrop-blur-xl border border-white/10 transition-all duration-500 hover:bg-white/10 hover:scale-[1.01] hover:shadow-2xl hover:shadow-indigo-500/20 flex flex-col justify-between min-h-[400px]">
-                        <div className="absolute top-0 right-0 -mt-4 -mr-4 h-32 w-32 rounded-full bg-indigo-500/20 blur-3xl transition-all duration-500 group-hover:bg-indigo-500/40"></div>
 
-                        <div className="flex justify-between items-start mb-6 relative z-10">
-                            <div>
-                                <h3 className="text-sm font-medium text-indigo-300 uppercase tracking-wider mb-1 font-serif">Streamgraph Analysis</h3>
-                                <p className="text-4xl font-bold text-white tracking-tight">Data Flow</p>
-                            </div>
-                        </div>
-
-                        {/* Streamgraph */}
-                        <div className="h-96 w-full relative z-10">
-                            <ParentSize>
-                                {({ width, height }) => <Streamgraph width={width} height={height} text="Data Flow" />}
-                            </ParentSize>
-                        </div>
-                    </div>
 
                 </div>
             </div>
