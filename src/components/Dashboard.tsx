@@ -205,7 +205,7 @@ const AnalyticsChart = withTooltip<
 
 const Dashboard = () => {
     return (
-        <section className="w-full min-h-screen px-4 py-12 md:px-12 lg:px-24 relative z-10">
+        <section className="w-full min-h-screen px-4 pt-32 pb-12 md:px-12 lg:px-24 relative z-10">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-12">
