@@ -48,16 +48,19 @@ export type StreamGraphProps = {
     width: number;
     height: number;
     text?: string;
+    loop?: boolean;
+    showControls?: boolean;
+    id?: string;
 };
 
-export default function Streamgraph({ width, height, text = "Reveal" }: StreamGraphProps) {
+export default function Streamgraph({ width, height, text = "Reveal", loop = false, showControls = true, id = "streamgraph" }: StreamGraphProps) {
     const [tick, setTick] = useState(0);
 
     // Animation loop
     useEffect(() => {
         const interval = setInterval(() => {
             setTick((t) => {
-                if (t >= 7) {
+                if (!loop && t >= 7) {
                     clearInterval(interval);
                     return t;
                 }
@@ -66,16 +69,17 @@ export default function Streamgraph({ width, height, text = "Reveal" }: StreamGr
         }, 800);
 
         return () => clearInterval(interval);
-    }, [tick]);
+    }, [tick, loop]);
 
     // Calculate multiplier based on tick
     const multiplier = useMemo(() => {
+        if (loop) return 1.0;
         if (tick < 4) return 1.0;
         if (tick === 4) return 0.6;
         if (tick === 5) return 0.3;
         if (tick === 6) return 0.1;
         return 0.0;
-    }, [tick]);
+    }, [tick, loop]);
 
     // Generate data based on tick/multiplier
     const layers = useMemo(() => {
@@ -105,29 +109,31 @@ export default function Streamgraph({ width, height, text = "Reveal" }: StreamGr
     return (
         <div className="relative w-full h-full overflow-hidden rounded-xl">
             {/* Revealed Text */}
-            <div className="absolute inset-0 flex items-center justify-center z-0">
-                <h2
-                    className={`text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 tracking-tighter drop-shadow-lg transition-opacity duration-1000 ${tick >= 4 ? 'opacity-100' : 'opacity-0'}`}
-                >
-                    {text}
-                </h2>
-            </div>
+            {showControls && (
+                <div className="absolute inset-0 flex items-center justify-center z-0">
+                    <h2
+                        className={`text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 tracking-tighter drop-shadow-lg transition-opacity duration-1000 ${tick >= 4 ? 'opacity-100' : 'opacity-0'}`}
+                    >
+                        {text}
+                    </h2>
+                </div>
+            )}
 
             {/* Streamgraph Cover */}
             <svg width={width} height={height} className="absolute inset-0 z-10 pointer-events-none">
-                <PatternCircles id="mustard" height={40} width={40} radius={5} fill="#036ecf" complement />
+                <PatternCircles id={`${id}-mustard`} height={40} width={40} radius={5} fill="#036ecf" complement />
                 <PatternWaves
-                    id="cherry"
+                    id={`${id}-cherry`}
                     height={12}
                     width={12}
                     fill="transparent"
                     stroke="#232493"
                     strokeWidth={1}
                 />
-                <PatternCircles id="navy" height={60} width={60} radius={10} fill="white" complement />
+                <PatternCircles id={`${id}-navy`} height={60} width={60} radius={10} fill="white" complement />
                 <PatternCircles
                     complement
-                    id="circles"
+                    id={`${id}-circles`}
                     height={60}
                     width={60}
                     radius={10}
@@ -148,7 +154,8 @@ export default function Streamgraph({ width, height, text = "Reveal" }: StreamGr
                             stacks.map((stack) => {
                                 const pathString = path(stack) || '';
                                 const color = colorScale(stack.key);
-                                const pattern = patternScale(stack.key);
+                                const patternName = patternScale(stack.key);
+                                const patternUrl = `url(#${id}-${patternName})`;
 
                                 // Interpolate path string
                                 const { d } = useSpring({
@@ -160,7 +167,7 @@ export default function Streamgraph({ width, height, text = "Reveal" }: StreamGr
                                 return (
                                     <g key={`series-${stack.key}`}>
                                         <animated.path d={d} fill={color} />
-                                        <animated.path d={d} fill={`url(#${pattern})`} />
+                                        <animated.path d={d} fill={patternUrl} />
                                     </g>
                                 );
                             })
@@ -170,18 +177,20 @@ export default function Streamgraph({ width, height, text = "Reveal" }: StreamGr
             </svg>
 
             {/* Replay Button */}
-            <div className={`absolute bottom-4 right-4 z-20 transition-opacity duration-500 ${tick >= 7 ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-                <button
-                    onClick={() => setTick(0)}
-                    className="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white text-sm font-medium transition-all flex items-center gap-2 group"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-rotate-180 transition-transform duration-500">
-                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                        <path d="M3 3v5h5" />
-                    </svg>
-                    Replay
-                </button>
-            </div>
+            {showControls && (
+                <div className={`absolute bottom-4 right-4 z-20 transition-opacity duration-500 ${tick >= 7 ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                    <button
+                        onClick={() => setTick(0)}
+                        className="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white text-sm font-medium transition-all flex items-center gap-2 group"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-rotate-180 transition-transform duration-500">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                            <path d="M3 3v5h5" />
+                        </svg>
+                        Replay
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

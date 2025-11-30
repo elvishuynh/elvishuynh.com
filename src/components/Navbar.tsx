@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import Streamgraph from "./Streamgraph/Streamgraph";
+
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -11,10 +13,13 @@ export default function Navbar() {
             <div className="w-full px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Brand */}
-                    <div className="flex-shrink-0 flex items-center">
+                    <div className="flex-shrink-0 flex items-center gap-4">
                         <Link href="#" className="text-2xl font-bold tracking-tighter hover:text-highlight transition-colors">
                             K-SHIFT
                         </Link>
+                        <div className="w-[100px] h-[40px] -mt-2">
+                            <Streamgraph width={100} height={40} loop={true} showControls={false} id="navbar-streamgraph" />
+                        </div>
                     </div>
 
                     {/* Desktop Menu */}
