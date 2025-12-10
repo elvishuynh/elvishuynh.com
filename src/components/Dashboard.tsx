@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useRef } from 'react';
 import FlippableActivityCard from './FlippableActivityCard';
 
 import { AreaClosed, LinePath, Bar } from '@visx/shape';
@@ -34,6 +34,10 @@ const AnalyticsChart = withTooltip<
 >(({ width, height, showTooltip, hideTooltip, tooltipData, tooltipTop = 0, tooltipLeft = 0 }) => {
     if (width < 10) return null;
 
+    // Refs
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const svgRef = useRef<SVGSVGElement>(null);
+
     // Bounds
     const margin = { top: 20, right: 0, bottom: 0, left: 0 };
     const xMax = width - margin.left - margin.right;
@@ -62,7 +66,11 @@ const AnalyticsChart = withTooltip<
     // Tooltip handler
     const handleTooltip = useCallback(
         (event: React.TouchEvent<SVGRectElement> | React.MouseEvent<SVGRectElement>) => {
-            const { x } = localPoint(event) || { x: 0 };
+            if (!svgRef.current) return;
+            const point = localPoint(svgRef.current, event);
+            if (!point) return;
+
+            const { x } = point;
             const x0 = xScale.invert(x);
             const index = bisectDate(chartData, x0, 1);
             const d0 = chartData[index - 1];
@@ -87,7 +95,7 @@ const AnalyticsChart = withTooltip<
 
     return (
         <div className="relative">
-            <svg width={width} height={height}>
+            <svg width={width} height={height} ref={svgRef}>
                 <LinearGradient id="area-gradient" from="#ff5315" to="#ff5315" fromOpacity={0.4} toOpacity={0} />
                 <LinearGradient id="line-gradient" from="#ff5315" to="#ffa300" />
 
@@ -146,10 +154,10 @@ const AnalyticsChart = withTooltip<
                 />
 
                 {tooltipData && (
-                    <g>
+                    <g transform={`translate(${tooltipLeft}, ${tooltipTop})`}>
                         <circle
-                            cx={tooltipLeft}
-                            cy={tooltipTop}
+                            cx={0}
+                            cy={0}
                             r={4}
                             fill="#a855f7"
                             stroke="#fff"
@@ -157,8 +165,8 @@ const AnalyticsChart = withTooltip<
                             pointerEvents="none"
                         />
                         <circle
-                            cx={tooltipLeft}
-                            cy={tooltipTop}
+                            cx={0}
+                            cy={0}
                             r={4}
                             fill="#ff5315"
                             stroke="#fff"
@@ -172,7 +180,6 @@ const AnalyticsChart = withTooltip<
 
             {tooltipData && (
                 <TooltipWithBounds
-                    key={Math.random()}
                     top={tooltipTop - 12}
                     left={tooltipLeft + 12}
                     style={{
