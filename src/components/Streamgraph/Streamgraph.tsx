@@ -14,26 +14,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import generateData from './generateData';
 
-// constants
-const NUM_LAYERS = 20;
-const SAMPLES_PER_LAYER = 200;
-const BUMPS_PER_LAYER = 10;
-export const BACKGROUND = '#ffdede';
-
 // utils
 const range = (n: number) => Array.from(new Array(n), (_, i) => i);
-
-const keys = range(NUM_LAYERS);
-
-// scales (domains are constant, ranges depend on width/height)
-const colorScale = scaleOrdinal<number, string>({
-    domain: keys,
-    range: ['#ffc409', '#f14702', '#262d97', 'white', '#036ecd', '#9ecadd', '#51666e'],
-});
-const patternScale = scaleOrdinal<number, string>({
-    domain: keys,
-    range: ['mustard', 'cherry', 'navy', 'circles', 'circles', 'circles', 'circles'],
-});
 
 export type StreamGraphProps = {
     width: number;
@@ -78,11 +60,41 @@ export default function Streamgraph({
 }: StreamGraphProps) {
     const [tick, setTick] = useState(0);
 
+    // Adaptive Resolution Configuration
+    // If width is small (navbar), use drastically reduced complexity to prevent scroll judder
+    // We treat anything <= 200px as a small/thumbnail usage
+    const isSmall = width <= 200;
+
+    // ADJUSTMENT: Restored layers and bumps to near-original values to fix "thin" look.
+    // Optimization relies primarily on reduced SAMPLES_PER_LAYER.
+    const NUM_LAYERS = isSmall ? 15 : 20; // Was 6. Increased to 15 to restore color density.
+    const SAMPLES_PER_LAYER = isSmall ? 60 : 200; // Was 40. Slight bump for smoothness, still 3x opt.
+    const BUMPS_PER_LAYER = isSmall ? 10 : 10; // Was 3. Restored to 10 so the total height/volume matches original.
+
+    // CONFIGURATION LEVERS EXPLANATION:
+    // 1. SAMPLES_PER_LAYER: Direct linear impact on performance. 60 samples is fine for 100px.
+    // 2. NUM_LAYERS: Multiplier impact. 15 layers is close to 20, preserving style.
+    // 3. BUMPS_PER_LAYER: Restored to 10 to ensure the stack accumulates enough height.
+
+    // Memoize keys and scales based on configuration to ensure stability
+    const keys = useMemo(() => range(NUM_LAYERS), [NUM_LAYERS]);
+
+    const colorScale = useMemo(() => scaleOrdinal<number, string>({
+        domain: keys,
+        range: ['#ffc409', '#f14702', '#262d97', 'white', '#036ecd', '#9ecadd', '#51666e'],
+    }), [keys]);
+
+    const patternScale = useMemo(() => scaleOrdinal<number, string>({
+        domain: keys,
+        range: ['mustard', 'cherry', 'navy', 'circles', 'circles', 'circles', 'circles'],
+    }), [keys]);
+
     // Create scales inside component to avoid shared state issues
+    // xScale depends on SAMPLES_PER_LAYER now
     const xScale = useMemo(() => scaleLinear<number>({
         domain: [0, SAMPLES_PER_LAYER - 1],
         range: [0, width]
-    }), [width]);
+    }), [width, SAMPLES_PER_LAYER]);
 
     const yScale = useMemo(() => scaleLinear<number>({
         domain: [-30, 50],
@@ -143,12 +155,13 @@ export default function Streamgraph({
         return range(50).map(() =>
             keys.map(() => generateData(SAMPLES_PER_LAYER, BUMPS_PER_LAYER))
         );
-    }, []);
+    }, [keys, SAMPLES_PER_LAYER, BUMPS_PER_LAYER]);
 
     // Generate data based on tick/multiplier
     const layers = useMemo(() => {
         if (!enableScrollInteraction && !loop && tick >= 7) {
             // Flat line
+            // Use dynamic SAMPLES_PER_LAYER
             return transpose<number>(
                 keys.map(() => new Array(SAMPLES_PER_LAYER).fill(0))
             );
@@ -164,7 +177,7 @@ export default function Streamgraph({
         );
 
         return transpose<number>(scaledLayers);
-    }, [tick, multiplier, enableScrollInteraction, loop, dataPool]);
+    }, [tick, multiplier, enableScrollInteraction, loop, dataPool, keys, SAMPLES_PER_LAYER]);
 
     if (width < 10) return null;
 
