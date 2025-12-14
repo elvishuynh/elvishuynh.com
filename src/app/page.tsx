@@ -7,17 +7,13 @@ export default function Home() {
       <ScrollManager />
 
       {/* Hero Section - Transparent to show LiquidGlassCursor */}
-      <section id="hero" className="h-screen w-full flex flex-col justify-center relative z-10 pointer-events-none">
-        <div className="w-full max-w-[90rem] px-8 md:px-24 flex flex-col gap-2 pointer-events-auto">
-          <div className="text-left">
-            <h2 className="text-8xl md:text-[10rem] font-bold text-white tracking-tighter mix-blend-overlay opacity-90 whitespace-nowrap leading-none">
-              Work Beautifully.
-            </h2>
-          </div>
+      <section id="hero" className="h-screen w-full flex flex-col justify-start pt-48 relative z-10 pointer-events-none">
+        <div className="w-full px-8 flex flex-col gap-2 pointer-events-auto">
+
 
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
             <div className="text-left">
-              <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tighter mix-blend-overlay opacity-90 whitespace-nowrap">
+              <h1 className="text-7xl md:text-9xl font-bold text-white tracking-tighter mix-blend-overlay opacity-90 whitespace-nowrap">
                 Methodology
               </h1>
             </div>
