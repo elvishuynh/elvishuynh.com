@@ -47,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${satoshi.variable} ${erode.variable} antialiased font-sans`}
+        className={`${satoshi.variable} ${erode.variable} antialiased font-sans bg-background text-foreground`}
       >
         <LiquidGlassCursor />
         <Navbar />
