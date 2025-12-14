@@ -13,12 +13,12 @@ export default function Home() {
 
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
             <div className="text-left">
-              <h1 className="text-7xl md:text-8xl font-bold text-white tracking-tighter mix-blend-overlay opacity-90 whitespace-nowrap">
+              <h1 className="text-[clamp(4rem,15vw,20rem)] font-bold text-white tracking-tighter mix-blend-overlay opacity-90 whitespace-nowrap">
                 Methodology
               </h1>
             </div>
             <div className="text-left max-w-[250px] flex items-center">
-              <p className="text-sm md:text-base text-white/90 font-serif font-light leading-relaxed">
+              <p className="text-[clamp(0.875rem,2vw,1.125rem)] text-white/90 font-serif font-light leading-relaxed">
                 Crafting digital experiences that merge creativity with technology.
                 Exploring the boundaries of interactive design and fluid user interfaces.
                 Building the future of web interactions one pixel at a time.

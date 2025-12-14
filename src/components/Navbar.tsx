@@ -14,7 +14,7 @@ export default function Navbar() {
                 <div className="flex justify-between items-center h-16">
                     {/* Brand */}
                     <div className="flex-shrink-0 flex items-center gap-4">
-                        <Link href="#" className="text-2xl font-bold tracking-widest hover:text-highlight transition-colors">
+                        <Link href="#" className="text-[clamp(1.5rem,2vw,2.5rem)] font-bold tracking-widest hover:text-highlight transition-colors">
                             ELVIS
                         </Link>
                         <div className="w-[100px] h-[40px] -mt-2">
@@ -24,15 +24,15 @@ export default function Navbar() {
 
                     {/* Desktop Menu */}
                     <div className="hidden md:flex items-center space-x-8">
-                        <Link href="/" className="text-sm font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <Link href="/" className="text-[clamp(0.875rem,0.8vw,1.125rem)] font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                             Home
                         </Link>
-                        <Link href="/" className="text-sm font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <Link href="/" className="text-[clamp(0.875rem,0.8vw,1.125rem)] font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                             About
                         </Link>
                         <Link
                             href="/"
-                            className="px-4 py-2 rounded-full bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                            className="px-[clamp(1rem,1vw,1.5rem)] py-[clamp(0.5rem,0.5vw,0.75rem)] rounded-full bg-black text-white text-[clamp(0.875rem,0.8vw,1.125rem)] font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-black dark:hover:bg-gray-200"
                         >
                             Contact
                         </Link>
