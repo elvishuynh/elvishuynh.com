@@ -67,9 +67,9 @@ export default function Streamgraph({
 
     // ADJUSTMENT: Restored layers and bumps to near-original values to fix "thin" look.
     // Optimization relies primarily on reduced SAMPLES_PER_LAYER.
-    const NUM_LAYERS = isSmall ? 15 : 20; // Was 6. Increased to 15 to restore color density.
-    const SAMPLES_PER_LAYER = isSmall ? 60 : 200; // Was 40. Slight bump for smoothness, still 3x opt.
-    const BUMPS_PER_LAYER = isSmall ? 10 : 10; // Was 3. Restored to 10 so the total height/volume matches original.
+    const NUM_LAYERS = isSmall ? 5 : 20; // Was 6. Increased to 15 to restore color density.
+    const SAMPLES_PER_LAYER = isSmall ? 40 : 200; // Was 40. Slight bump for smoothness, still 3x opt.
+    const BUMPS_PER_LAYER = isSmall ? 20 : 10; // Was 3. Restored to 10 so the total height/volume matches original.
 
     // CONFIGURATION LEVERS EXPLANATION:
     // 1. SAMPLES_PER_LAYER: Direct linear impact on performance. 60 samples is fine for 100px.
