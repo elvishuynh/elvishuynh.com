@@ -14,7 +14,7 @@ export default function Navbar() {
                 <div className="flex justify-between items-center h-16">
                     {/* Brand */}
                     <div className="flex-shrink-0 flex items-center gap-4">
-                        <Link href="#" className="fl-text-sm/lg font-bold tracking-widest hover:text-highlight transition-colors">
+                        <Link href="#" className="fl-text-base/xl font-bold tracking-widest hover:text-highlight transition-colors">
                             ELVIS
                         </Link>
                         <div className="w-[100px] h-[40px] -mt-2">
@@ -34,7 +34,7 @@ export default function Navbar() {
                             href="/"
                             className="inline-flex items-center justify-center whitespace-nowrap fl-px-6/8 fl-py-2/3 rounded-full bg-black text-white fl-text-sm/lg font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-black dark:hover:bg-gray-200"
                         >
-                            Contact
+                            ContactO
                         </Link>
                     </div>
 

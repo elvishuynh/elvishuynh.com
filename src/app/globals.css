@@ -2,9 +2,6 @@
 @plugin "fluid-tailwindcss";
 
 @theme {
-    --font-satoshi: var(--font-satoshi);
-    --font-erode: var(--font-erode);
-
     --color-background: #e8e6df;
     --color-foreground: #1d252d;
 
@@ -12,4 +9,14 @@
 
     --color-highlight-orange: #ff5f15;
     --color-highlight-yellow: #ffa300;
+}
+
+@layer utilities {
+    .font-sans {
+        font-family: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    }
+
+    .font-serif {
+        font-family: var(--font-erode), ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    }
 }
