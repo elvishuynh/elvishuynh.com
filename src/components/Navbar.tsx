@@ -14,7 +14,7 @@ export default function Navbar() {
                 <div className="flex justify-between items-center h-16">
                     {/* Brand */}
                     <div className="flex-shrink-0 flex items-center gap-4">
-                        <Link href="#" className="fl-text-base/xl font-bold tracking-widest hover:text-highlight transition-colors">
+                        <Link href="#" className="fl-text-xl/3xl font-bold tracking-widest hover:text-highlight transition-colors">
                             ELVIS
                         </Link>
                         <div className="w-[100px] h-[40px] -mt-2">
@@ -24,10 +24,10 @@ export default function Navbar() {
 
                     {/* Desktop Menu */}
                     <div className="hidden md:flex items-center space-x-8">
-                        <Link href="/" className="fl-text-sm/lg font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <Link href="/" className="fl-text-base/xl font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                             Home
                         </Link>
-                        <Link href="/" className="fl-text-sm/lg font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <Link href="/" className="fl-text-base/xl font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                             About
                         </Link>
                         <Link
