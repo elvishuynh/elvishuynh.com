@@ -11,14 +11,14 @@ export default function Home() {
         <div className="w-full px-8 flex flex-col gap-2 pointer-events-auto">
 
 
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
+          <div className="flex flex-col items-start gap-2 w-min">
             <div className="text-left">
-              <h1 className="text-[clamp(4rem,20vw,20rem)] font-bold text-white tracking-tighter mix-blend-overlay opacity-90 whitespace-nowrap">
-                Methodology
+              <h1 className="text-[clamp(4rem,20vw,15rem)] font-bold text-white tracking-tighter mix-blend-overlay opacity-90 whitespace-nowrap">
+                Creative Director
               </h1>
             </div>
-            <div className="text-left max-w-[250px] flex items-center">
-              <p className="fl-text-base/2xl text-white/90 font-serif font-light leading-relaxed">
+            <div className="text-left w-full flex items-center">
+              <p className="fl-text-base/2xl text-white/90 font-serif font-light leading-relaxed text-justify">
                 Crafting digital experiences that merge creativity with technology.
                 Exploring the boundaries of interactive design and fluid user interfaces.
                 Building the future of web interactions one pixel at a time.
