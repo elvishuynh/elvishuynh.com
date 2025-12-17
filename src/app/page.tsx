@@ -13,21 +13,19 @@ export default function Home() {
 
           <div className="flex flex-col items-start gap-2 w-min">
             <div className="text-left">
-              <h1 className="text-[clamp(4rem,20vw,15rem)] font-bold text-white tracking-tighter mix-blend-overlay opacity-90 whitespace-nowrap">
+              <h1 className="text-[clamp(4rem,20vw,15rem)] font-bold text-white tracking-tighter whitespace-nowrap">
                 Creative Director
               </h1>
             </div>
             <div className="text-left w-full flex items-center">
-              <p className="fl-text-base/2xl text-white/90 font-serif font-light leading-relaxed text-justify">
-                Crafting digital experiences that merge creativity with technology.
-                Exploring the boundaries of interactive design and fluid user interfaces.
-                Building the future of web interactions one pixel at a time.
+              <p className="fl-text-base/2xl text-white font-serif font-light leading-relaxed text-justify">
+                I am Elvis Huynh, a multidisciplinary human who my clients trust to amplify their voice and brand through digital mediums.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="absolute bottom-12 animate-bounce text-white/50">
+        <div className="absolute bottom-12 animate-bounce text-white">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
           </svg>

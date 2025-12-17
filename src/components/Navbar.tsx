@@ -34,7 +34,7 @@ export default function Navbar() {
                             href="/"
                             className="inline-flex items-center justify-center whitespace-nowrap fl-px-6/8 fl-py-2/3 rounded-full bg-black text-white fl-text-sm/lg font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-black dark:hover:bg-gray-200"
                         >
-                            ContactO
+                            Contact
                         </Link>
                     </div>
 

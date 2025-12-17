@@ -219,7 +219,7 @@ const Dashboard = () => {
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
                         Dashboard
                     </h2>
-                    <p className="text-lg text-white/60 font-serif italic">
+                    <p className="text-lg text-gray-300 font-serif italic">
                         A snapshot of how K-SHIFT has influenced client insights in the first month of working together.
                     </p>
                 </div>
@@ -237,7 +237,7 @@ const Dashboard = () => {
                         </div>
 
                         <div className="flex items-center justify-between text-sm text-green-400 mt-6">
-                            <span className="text-white/40 font-serif italic">Colossus Bread</span>
+                            <span className="text-gray-400 font-serif italic">Colossus Bread</span>
                             <span className="bg-green-400/10 px-2 py-1 rounded-full">+48%</span>
                         </div>
                     </div>
@@ -252,7 +252,7 @@ const Dashboard = () => {
                         </div>
 
                         <div className="flex items-center justify-between text-sm text-green-400 mt-6">
-                            <span className="text-white/40 font-serif italic">Jawny's</span>
+                            <span className="text-gray-400 font-serif italic">Jawny's</span>
                             <span className="bg-green-400/10 px-2 py-1 rounded-full">+72%</span>
                         </div>
                     </div>
@@ -267,7 +267,7 @@ const Dashboard = () => {
                         </div>
 
                         <div className="flex items-center justify-between text-sm text-green-400 mt-6">
-                            <span className="text-white/40 font-serif italic">Panacea Regenerative</span>
+                            <span className="text-gray-400 font-serif italic">Panacea Regenerative</span>
                             <span className="bg-green-400/10 px-2 py-1 rounded-full">+69%</span>
                         </div>
                     </div>
@@ -283,7 +283,7 @@ const Dashboard = () => {
                                 <p className="text-4xl font-bold text-white tracking-tight">1.2M</p>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <span className="text-white/40 font-serif italic text-sm">vs. Previous Period</span>
+                                <span className="text-gray-400 font-serif italic text-sm">vs. Previous Period</span>
                                 <span className="bg-green-400/10 text-green-400 px-2 py-1 rounded-full text-sm font-medium">+115%</span>
                             </div>
                         </div>
