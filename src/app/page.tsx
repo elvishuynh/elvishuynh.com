@@ -3,7 +3,7 @@ import ScrollManager from "@/components/ScrollManager";
 
 export default function Home() {
   return (
-    <main className="flex h-screen flex-row items-center justify-start relative w-[200vw] overflow-x-hidden">
+    <main className="flex h-screen flex-row items-center justify-start relative w-[300vw] overflow-x-hidden">
       <ScrollManager />
 
       {/* Hero Section - Transparent to show LiquidGlassCursor */}
@@ -30,6 +30,20 @@ export default function Home() {
             <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
           </svg>
         </div>
+      </section>
+
+      {/* Video Section */}
+      <section id="video-section" className="w-screen h-screen flex-shrink-0 bg-black relative z-20 overflow-hidden">
+        <video
+          className="w-full h-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+        >
+          <source src="https://pub-d24ed1d740a7460195197f5ee2413105.r2.dev/hero-video-1.m4v" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
       </section>
 
       {/* Dashboard Section */}

@@ -27,7 +27,14 @@ export default function ScrollManager() {
                 type: "wheel,touch,pointer",
                 onDown: () => {
                     if (isAnimating.current) return;
-                    if (window.scrollX < 50) { // If at top (Hero) and scrolling down/right
+                    const width = window.innerWidth;
+                    const scrollX = window.scrollX;
+
+                    if (scrollX < 50) { // If at top (Hero) and scrolling down/right -> Go to Video
+                        isAnimating.current = true;
+                        gsap.to(window, { scrollTo: { x: "#video-section" }, duration: 1, ease: "power2.out" });
+                        setTimeout(() => isAnimating.current = false, 1000);
+                    } else if (scrollX >= width - 50 && scrollX < width + 50) { // At Video, go to Dashboard
                         isAnimating.current = true;
                         gsap.to(window, { scrollTo: { x: "#dashboard" }, duration: 1, ease: "power2.out" });
                         setTimeout(() => isAnimating.current = false, 1000);
@@ -35,9 +42,17 @@ export default function ScrollManager() {
                 },
                 onUp: () => {
                     if (isAnimating.current) return;
-                    const dashboardLeft = document.getElementById("dashboard")?.offsetLeft || window.innerWidth;
-                    // If at Dashboard and scrolling up/left
-                    if (window.scrollX >= dashboardLeft - 50 && window.scrollX < dashboardLeft + 200) {
+                    const width = window.innerWidth;
+                    const scrollX = window.scrollX;
+
+                    // If at Dashboard (approx 2 * width) -> Go to Video
+                    if (scrollX >= 2 * width - 50) {
+                        isAnimating.current = true;
+                        gsap.to(window, { scrollTo: { x: "#video-section" }, duration: 1, ease: "power2.out" });
+                        setTimeout(() => isAnimating.current = false, 1000);
+                    }
+                    // If at Video and scrolling up/left -> Go to Hero
+                    else if (scrollX >= width - 50 && scrollX < width + 50) {
                         isAnimating.current = true;
                         gsap.to(window, { scrollTo: { x: "#hero" }, duration: 1, ease: "power2.out" });
                         setTimeout(() => isAnimating.current = false, 1000);
