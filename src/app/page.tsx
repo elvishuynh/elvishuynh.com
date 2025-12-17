@@ -3,11 +3,11 @@ import ScrollManager from "@/components/ScrollManager";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between relative">
+    <main className="flex h-screen flex-row items-center justify-start relative w-[200vw] overflow-x-hidden">
       <ScrollManager />
 
       {/* Hero Section - Transparent to show LiquidGlassCursor */}
-      <section id="hero" className="h-screen w-full flex flex-col justify-start pt-20 relative z-10 pointer-events-none">
+      <section id="hero" className="h-screen w-screen flex-shrink-0 flex flex-col justify-start pt-20 relative z-10 pointer-events-none">
         <div className="w-full px-8 flex flex-col gap-2 pointer-events-auto">
 
 
@@ -33,7 +33,7 @@ export default function Home() {
       </section>
 
       {/* Dashboard Section */}
-      <div id="dashboard" className="w-full relative z-20">
+      <div id="dashboard" className="w-screen h-screen flex-shrink-0 relative z-20">
         <Dashboard />
       </div>
     </main>

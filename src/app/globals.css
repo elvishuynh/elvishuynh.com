@@ -20,3 +20,13 @@
         font-family: var(--font-erode), ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     }
 }
+
+/* Hide Scrollbars */
+body {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}

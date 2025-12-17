@@ -111,9 +111,13 @@ export default function Streamgraph({
             gsap.registerPlugin(ScrollTrigger);
 
             const trigger = ScrollTrigger.create({
-                trigger: "body",
-                start: "top top",
-                end: "bottom bottom",
+                trigger: "body", // or use document.documentElement or a wrapper if specific
+                start: "top left", // "top top" for vertical, "left left" for horizontal usually? 
+                // Wait, if it's horizontal, the start/end might be "left left" etc. 
+                // But simplified: just adding horizontal: true to the config often dictates how start/end are interpreted if scroller is default?
+                // Actually, let's look at GSAP docs for horizontal.
+                // Usually we just need to read the scroll value correctly.
+                horizontal: true,
                 onUpdate: (self) => {
                     // Change shape every 200px of scroll
                     const newTick = Math.floor(self.scroll() / 200);

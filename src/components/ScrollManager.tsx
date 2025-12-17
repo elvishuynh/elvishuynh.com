@@ -15,11 +15,11 @@ export default function ScrollManager() {
 
         const ctx = gsap.context(() => {
             // Initialize ScrollSmoother
-            ScrollSmoother.create({
-                smooth: 1,
-                effects: true,
-                smoothTouch: 0.1,
-            });
+            // ScrollSmoother.create({
+            //     smooth: 1,
+            //     effects: true,
+            //     smoothTouch: 0.1,
+            // });
 
             // Observer for "One Notch" Scroll
             ScrollTrigger.observe({
@@ -27,19 +27,19 @@ export default function ScrollManager() {
                 type: "wheel,touch,pointer",
                 onDown: () => {
                     if (isAnimating.current) return;
-                    if (window.scrollY < 50) { // If at top (Hero) and scrolling down
+                    if (window.scrollX < 50) { // If at top (Hero) and scrolling down/right
                         isAnimating.current = true;
-                        gsap.to(window, { scrollTo: "#dashboard", duration: 1, ease: "power2.out" });
+                        gsap.to(window, { scrollTo: { x: "#dashboard" }, duration: 1, ease: "power2.out" });
                         setTimeout(() => isAnimating.current = false, 1000);
                     }
                 },
                 onUp: () => {
                     if (isAnimating.current) return;
-                    const dashboardTop = document.getElementById("dashboard")?.offsetTop || window.innerHeight;
-                    // If at Dashboard and scrolling up
-                    if (window.scrollY >= dashboardTop - 50 && window.scrollY < dashboardTop + 200) {
+                    const dashboardLeft = document.getElementById("dashboard")?.offsetLeft || window.innerWidth;
+                    // If at Dashboard and scrolling up/left
+                    if (window.scrollX >= dashboardLeft - 50 && window.scrollX < dashboardLeft + 200) {
                         isAnimating.current = true;
-                        gsap.to(window, { scrollTo: "#hero", duration: 1, ease: "power2.out" });
+                        gsap.to(window, { scrollTo: { x: "#hero" }, duration: 1, ease: "power2.out" });
                         setTimeout(() => isAnimating.current = false, 1000);
                     }
                 },

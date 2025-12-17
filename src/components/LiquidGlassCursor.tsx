@@ -869,12 +869,12 @@ export default function LiquidGlassCursor() {
 
         // --- SCROLL OPTIMIZATION ---
         const handleScroll = () => {
-            const scrollY = window.scrollY;
-            const windowHeight = window.innerHeight;
+            const scrollX = window.scrollX;
+            const windowWidth = window.innerWidth;
 
             // 1. Gradual Blur & Darkening
-            // Blur from 0px to 30px as we scroll from 0 to windowHeight
-            const progress = Math.min(scrollY / windowHeight, 1.0);
+            // Blur from 0px to 30px as we scroll from 0 to windowWidth
+            const progress = Math.min(scrollX / windowWidth, 1.0);
             const blurAmount = progress * 30;
 
             if (canvas) {
@@ -888,7 +888,7 @@ export default function LiquidGlassCursor() {
 
             // 2. "Let Go" Freeze Logic
             // Freeze only when the dashboard is almost fully visible (e.g. 95% scrolled)
-            const shouldFreeze = scrollY > windowHeight - 50;
+            const shouldFreeze = scrollX > windowWidth - 50;
 
             if (shouldFreeze !== isFrozen) {
                 isFrozen = shouldFreeze;
