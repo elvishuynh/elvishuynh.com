@@ -110,17 +110,15 @@ export default function Streamgraph({
         if (enableScrollInteraction) {
             gsap.registerPlugin(ScrollTrigger);
 
+            // Use global scroll tracking
             const trigger = ScrollTrigger.create({
-                trigger: "body", // or use document.documentElement or a wrapper if specific
-                start: "top left", // "top top" for vertical, "left left" for horizontal usually? 
-                // Wait, if it's horizontal, the start/end might be "left left" etc. 
-                // But simplified: just adding horizontal: true to the config often dictates how start/end are interpreted if scroller is default?
-                // Actually, let's look at GSAP docs for horizontal.
-                // Usually we just need to read the scroll value correctly.
+                start: 0,
+                end: "max",
                 horizontal: true,
                 onUpdate: (self) => {
-                    // Change shape every 200px of scroll
-                    const newTick = Math.floor(self.scroll() / 200);
+                    // self.progress (0-1) tracks the entire horizontal scroll range of the page
+                    const totalTicks = 50;
+                    const newTick = Math.floor(self.progress * totalTicks);
                     setTick(prev => {
                         if (prev !== newTick) return newTick;
                         return prev;
