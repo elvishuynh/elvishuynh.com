@@ -8,7 +8,7 @@ export default function Home() {
 
       {/* Hero Section - Transparent to show LiquidGlassCursor */}
       <section id="hero" className="h-screen w-screen flex-shrink-0 flex flex-col justify-start pt-20 relative z-10 pointer-events-none">
-        <div className="w-full px-8 flex flex-col gap-2 pointer-events-auto">
+        <div className="w-full px-16 flex flex-col gap-2 pointer-events-auto">
 
 
           <div className="flex flex-col items-start gap-2 w-min">
