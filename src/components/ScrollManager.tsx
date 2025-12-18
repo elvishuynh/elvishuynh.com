@@ -30,11 +30,15 @@ export default function ScrollManager() {
                     const width = window.innerWidth;
                     const scrollX = window.scrollX;
 
-                    if (scrollX < 50) { // If at top (Hero) and scrolling down/right -> Go to Video
+                    if (scrollX < 50) { // Hero -> Video
                         isAnimating.current = true;
                         gsap.to(window, { scrollTo: { x: "#video-section" }, duration: 1, ease: "power2.out" });
                         setTimeout(() => isAnimating.current = false, 1000);
-                    } else if (scrollX >= width - 50 && scrollX < width + 50) { // At Video, go to Dashboard
+                    } else if (scrollX >= width - 50 && scrollX < width + 50) { // Video -> Vertical Videos
+                        isAnimating.current = true;
+                        gsap.to(window, { scrollTo: { x: "#vertical-videos" }, duration: 1, ease: "power2.out" });
+                        setTimeout(() => isAnimating.current = false, 1000);
+                    } else if (scrollX >= 2 * width - 50 && scrollX < 2 * width + 50) { // Vertical Videos -> Dashboard
                         isAnimating.current = true;
                         gsap.to(window, { scrollTo: { x: "#dashboard" }, duration: 1, ease: "power2.out" });
                         setTimeout(() => isAnimating.current = false, 1000);
@@ -45,13 +49,19 @@ export default function ScrollManager() {
                     const width = window.innerWidth;
                     const scrollX = window.scrollX;
 
-                    // If at Dashboard (approx 2 * width) -> Go to Video
-                    if (scrollX >= 2 * width - 50) {
+                    // If at Dashboard (approx 3 * width) -> Go to Vertical Videos
+                    if (scrollX >= 3 * width - 50) {
+                        isAnimating.current = true;
+                        gsap.to(window, { scrollTo: { x: "#vertical-videos" }, duration: 1, ease: "power2.out" });
+                        setTimeout(() => isAnimating.current = false, 1000);
+                    }
+                    // If at Vertical Videos (approx 2 * width) -> Go to Video
+                    else if (scrollX >= 2 * width - 50 && scrollX < 2 * width + 50) {
                         isAnimating.current = true;
                         gsap.to(window, { scrollTo: { x: "#video-section" }, duration: 1, ease: "power2.out" });
                         setTimeout(() => isAnimating.current = false, 1000);
                     }
-                    // If at Video and scrolling up/left -> Go to Hero
+                    // If at Video (approx 1 * width) -> Go to Hero
                     else if (scrollX >= width - 50 && scrollX < width + 50) {
                         isAnimating.current = true;
                         gsap.to(window, { scrollTo: { x: "#hero" }, duration: 1, ease: "power2.out" });
