@@ -285,7 +285,7 @@ export default function LiquidGlassCursor() {
         // --- VIDEO SETUP ---
         const video = document.createElement("video");
         video.crossOrigin = "anonymous";
-        video.src = "https://pub-d24ed1d740a7460195197f5ee2413105.r2.dev/web_interactive_color.mp4";
+        video.src = "https://pub-8174d09100b94b44a3652e216045fe1b.r2.dev/web_interactive_color.mp4";
         video.loop = true;
         video.muted = true;
         video.preload = "auto";

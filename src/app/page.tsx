@@ -41,16 +41,46 @@ export default function Home() {
           loop
           playsInline
         >
-          <source src="https://pub-d24ed1d740a7460195197f5ee2413105.r2.dev/hero-video-1.m4v" type="video/mp4" />
+          <source src="https://pub-8174d09100b94b44a3652e216045fe1b.r2.dev/web_filmreel.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       </section>
 
       {/* Vertical Videos Section */}
       <section id="vertical-videos" className="w-screen h-screen flex-shrink-0 bg-black relative z-20 flex flex-row items-stretch justify-center overflow-hidden">
-        <div className="h-full flex-1 bg-[#9ca3af] transition-colors hover:bg-[#838a95] relative"></div>
-        <div className="h-full flex-1 bg-[#4b5563] transition-colors hover:bg-[#374151] relative"></div>
-        <div className="h-full flex-1 bg-[#1f2937] transition-colors hover:bg-[#111827] relative"></div>
+        <div className="h-full flex-1 relative">
+          <video
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+          >
+            <source src="https://pub-8174d09100b94b44a3652e216045fe1b.r2.dev/web_stravawarrior.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="h-full flex-1 relative">
+          <video
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+          >
+            <source src="https://pub-8174d09100b94b44a3652e216045fe1b.r2.dev/web_sephoradolcegabbana.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="h-full flex-1 relative">
+          <video
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+          >
+            <source src="https://pub-8174d09100b94b44a3652e216045fe1b.r2.dev/web_colossusbread.mp4" type="video/mp4" />
+          </video>
+        </div>
       </section>
 
       {/* Dashboard Section */}
