@@ -220,7 +220,7 @@ const Dashboard = () => {
                         Dashboard
                     </h2>
                     <p className="text-lg text-gray-300 font-serif italic">
-                        A snapshot of how K-SHIFT has influenced client insights in the first month of working together.
+                        A snapshot of how client insights have been influenced in the first month of working with me.
                     </p>
                 </div>
 

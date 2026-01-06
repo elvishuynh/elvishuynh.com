@@ -19,7 +19,7 @@ export default function Home() {
             </div>
             <div className="text-left w-full flex items-center">
               <p className="fl-text-base/2xl text-white font-serif font-light leading-relaxed text-justify">
-                I am Elvis Huynh, a multidisciplinary human who my clients trust to amplify their voice and brand through digital mediums.
+                I am Elvis Huynh, a multidisciplinary cinematographer who my clients trust to amplify their voice and brand through digital mediums.
               </p>
             </div>
           </div>
