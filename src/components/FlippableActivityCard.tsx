@@ -53,7 +53,7 @@ const FlippableActivityCard = () => {
             >
                 {/* === FRONT FACE === */}
                 <div
-                    className="face front absolute inset-0 rounded-3xl bg-[#e8e6df] border border-gray-200 shadow-xl"
+                    className="face front absolute inset-0 rounded-3xl bg-background border border-gray-200 shadow-xl"
                     style={{
                         backfaceVisibility: 'hidden',
                         WebkitBackfaceVisibility: 'hidden',
@@ -81,7 +81,7 @@ const FlippableActivityCard = () => {
 
                         {/* Text Content */}
                         <div className="mt-6 text-center">
-                            <h3 className="text-3xl font-bold text-black mb-1">Elvis Huynh</h3>
+                            <h3 className="text-3xl font-bold text-foreground mb-1">Elvis Huynh</h3>
                             <p className="text-gray-500 font-medium">Creative Director</p>
                         </div>
 
@@ -97,7 +97,7 @@ const FlippableActivityCard = () => {
 
                 {/* === BACK FACE === */}
                 <div
-                    className="face back absolute inset-0 rounded-3xl bg-[#b1b3b3] shadow-xl"
+                    className="face back absolute inset-0 rounded-3xl bg-background shadow-xl border border-gray-200"
                     style={{
                         backfaceVisibility: 'hidden',
                         WebkitBackfaceVisibility: 'hidden',
@@ -134,7 +134,7 @@ const FlippableActivityCard = () => {
 
                         {/* Text Content */}
                         <div className="mt-6 text-center">
-                            <h3 className="text-3xl font-bold text-black mb-1">GOAL</h3>
+                            <h3 className="text-3xl font-bold text-foreground mb-1">GOAL</h3>
                             <p className="text-gray-500 text-sm">
                                 Increase user engagement by 25% Q3
                             </p>
