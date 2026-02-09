@@ -41,7 +41,7 @@ export default function Home() {
           loop
           playsInline
         >
-          <source src="https://pub-8174d09100b94b44a3652e216045fe1b.r2.dev/web_filmreel.mp4" type="video/mp4" />
+          <source src="https://assets.elvishuynh.com/web_filmreel.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       </section>
@@ -56,7 +56,7 @@ export default function Home() {
             loop
             playsInline
           >
-            <source src="https://pub-8174d09100b94b44a3652e216045fe1b.r2.dev/web_stravawarrior.mp4" type="video/mp4" />
+            <source src="https://assets.elvishuynh.com/web_stravawarrior.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="h-full flex-1 relative">
@@ -67,7 +67,7 @@ export default function Home() {
             loop
             playsInline
           >
-            <source src="https://pub-8174d09100b94b44a3652e216045fe1b.r2.dev/web_sephoradolcegabbana.mp4" type="video/mp4" />
+            <source src="https://assets.elvishuynh.com/web_sephoradolcegabbana.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="h-full flex-1 relative">
@@ -78,7 +78,7 @@ export default function Home() {
             loop
             playsInline
           >
-            <source src="https://pub-8174d09100b94b44a3652e216045fe1b.r2.dev/web_colossusbread.mp4" type="video/mp4" />
+            <source src="https://assets.elvishuynh.com/web_colossusbread.mp4" type="video/mp4" />
           </video>
         </div>
       </section>
