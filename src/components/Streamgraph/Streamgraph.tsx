@@ -97,7 +97,7 @@ export default function Streamgraph({
     }), [width, SAMPLES_PER_LAYER]);
 
     const yScale = useMemo(() => scaleLinear<number>({
-        domain: [-30, 50],
+        domain: [-40, 40],
         range: [height, 0]
     }), [height]);
 

@@ -29,15 +29,15 @@ export default function Navbar() {
 
     return (
         <nav className="fixed w-full z-50 bg-transparent text-white">
-            <div className="w-full px-16">
-                <div className="flex justify-between items-center h-32">
+            <div className="w-full px-8">
+                <div className="flex justify-between items-center h-20">
                     {/* Brand */}
                     <div className="flex-shrink-0 flex items-center gap-4">
-                        <Link href="#hero" onClick={handleHomeClick} className="fl-text-xl/3xl font-bold tracking-widest hover:text-highlight transition-colors">
-                            ELVIS
+                        <Link href="#hero" onClick={handleHomeClick} className="fl-text-lg/2xl font-bold tracking-widest hover:text-highlight transition-colors">
+                            ELVIS HUYNH
                         </Link>
-                        <div className="w-[100px] h-[40px] -mt-2">
-                            <Streamgraph width={100} height={40} showControls={false} id="navbar-streamgraph" enableScrollInteraction={true} />
+                        <div className="w-[150px] h-[50px]">
+                            <Streamgraph width={150} height={50} showControls={false} id="navbar-streamgraph" enableScrollInteraction={true} />
                         </div>
                     </div>
 
@@ -51,7 +51,7 @@ export default function Navbar() {
                         </Link>
                         <Link
                             href="/"
-                            className="inline-flex items-center justify-center whitespace-nowrap fl-px-3/4 fl-py-2/3 rounded-full bg-black text-white fl-text-sm/lg font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                            className="inline-flex items-center justify-center whitespace-nowrap px-5 py-2 rounded-full bg-black text-white fl-text-sm/base font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-black dark:hover:bg-gray-200"
                         >
                             Contact
                         </Link>
