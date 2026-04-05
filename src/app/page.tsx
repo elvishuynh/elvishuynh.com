@@ -4,7 +4,7 @@ import MeasuringStepper from "@/components/MeasuringStepper";
 
 export default function Home() {
   return (
-    <main className="flex h-screen flex-row items-center justify-start relative w-[400vw] overflow-x-hidden">
+    <main className="flex h-screen flex-row items-center justify-start relative w-[400vw] overflow-x-hidden isolate">
       <ScrollManager />
       <MeasuringStepper />
 
@@ -71,7 +71,7 @@ export default function Home() {
       </section>
 
       {/* Dashboard Section */}
-      <div id="dashboard" className="w-screen h-screen flex-shrink-0 relative z-20">
+      <div id="dashboard" className="w-screen h-screen flex-shrink-0 relative z-20 bg-foreground">
         <Dashboard />
       </div>
     </main>
