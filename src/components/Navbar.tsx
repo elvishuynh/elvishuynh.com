@@ -2,11 +2,30 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import gsap from "gsap";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
 import Streamgraph from "./Streamgraph/Streamgraph";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+
+    // Scroll Architecture Notes:
+    // This site operates on a horizontal layout (w-[400vw]).
+    // To match the behavior of ScrollManager.tsx, we must import GSAP's 
+    // ScrollToPlugin and animate the window along the X-axis (instead of Y).
+
+    const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        gsap.registerPlugin(ScrollToPlugin);
+        gsap.to(window, { scrollTo: { x: "#hero" }, duration: 1, ease: "power2.out" });
+    };
+
+    const handleAboutClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        gsap.registerPlugin(ScrollToPlugin);
+        gsap.to(window, { scrollTo: { x: "#dashboard" }, duration: 1, ease: "power2.out" });
+    };
 
     return (
         <nav className="fixed w-full z-50 bg-transparent text-white">
@@ -14,7 +33,7 @@ export default function Navbar() {
                 <div className="flex justify-between items-center h-32">
                     {/* Brand */}
                     <div className="flex-shrink-0 flex items-center gap-4">
-                        <Link href="#" className="fl-text-xl/3xl font-bold tracking-widest hover:text-highlight transition-colors">
+                        <Link href="#hero" onClick={handleHomeClick} className="fl-text-xl/3xl font-bold tracking-widest hover:text-highlight transition-colors">
                             ELVIS
                         </Link>
                         <div className="w-[100px] h-[40px] -mt-2">
@@ -24,10 +43,10 @@ export default function Navbar() {
 
                     {/* Desktop Menu */}
                     <div className="hidden md:flex items-center space-x-8">
-                        <Link href="/" className="fl-text-base/xl font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <Link href="#hero" onClick={handleHomeClick} className="fl-text-base/xl font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                             Home
                         </Link>
-                        <Link href="/" className="fl-text-base/xl font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <Link href="#dashboard" onClick={handleAboutClick} className="fl-text-base/xl font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                             About
                         </Link>
                         <Link
@@ -77,13 +96,21 @@ export default function Navbar() {
             <div className={`${isOpen ? "block" : "hidden"} md:hidden absolute w-full bg-white dark:bg-black border-b border-gray-100 dark:border-gray-800`}>
                 <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                     <Link
-                        href="/"
+                        href="#hero"
+                        onClick={(e) => {
+                            handleHomeClick(e);
+                            setIsOpen(false);
+                        }}
                         className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                     >
                         Home
                     </Link>
                     <Link
-                        href="/"
+                        href="#dashboard"
+                        onClick={(e) => {
+                            handleAboutClick(e);
+                            setIsOpen(false);
+                        }}
                         className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                     >
                         About
