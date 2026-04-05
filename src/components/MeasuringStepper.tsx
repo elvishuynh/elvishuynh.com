@@ -71,9 +71,9 @@ export default function MeasuringStepper() {
                 mixBlendMode: "difference",
                 /* Edge fade masks — ruler vanishes at screen edges */
                 maskImage:
-                    "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
+                    "linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%)",
                 WebkitMaskImage:
-                    "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
+                    "linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%)",
             }}
         >
             {/* ── Stationary needle (centre of viewport) ─────────────── */}
@@ -118,6 +118,7 @@ export default function MeasuringStepper() {
                         >
                             <span
                                 style={{
+                                    fontFamily: "var(--font-erode)",
                                     fontSize: "11px",
                                     fontWeight: 700,
                                     letterSpacing: "0.25em",
@@ -135,7 +136,6 @@ export default function MeasuringStepper() {
                         className="absolute bottom-0 left-0 w-full"
                         style={{
                             height: "32px",
-                            borderTop: "1px solid rgba(255,255,255,0.2)",
                         }}
                     >
                         {Array.from({ length: TOTAL_TICKS }).map((_, i) => {
@@ -146,10 +146,11 @@ export default function MeasuringStepper() {
                             return (
                                 <div
                                     key={i}
-                                    className="absolute bottom-0"
+                                    className="absolute"
                                     style={{
                                         left: `${progress * 100}%`,
-                                        transform: "translateX(-50%)",
+                                        top: "50%",
+                                        transform: "translate(-50%, -50%)",
                                         width: isMajor ? "1.5px" : "1px",
                                         height: isMajor ? "22px" : isMedium ? "14px" : "8px",
                                         background: "white",
