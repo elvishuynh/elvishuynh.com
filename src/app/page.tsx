@@ -1,10 +1,12 @@
 import Dashboard from "@/components/Dashboard";
 import ScrollManager from "@/components/ScrollManager";
+import MeasuringStepper from "@/components/MeasuringStepper";
 
 export default function Home() {
   return (
     <main className="flex h-screen flex-row items-center justify-start relative w-[400vw] overflow-x-hidden">
       <ScrollManager />
+      <MeasuringStepper />
 
       {/* Hero Section - Transparent to show LiquidGlassCursor */}
       <section id="hero" className="h-screen w-screen flex-shrink-0 flex flex-col justify-start pt-20 relative z-10 pointer-events-none">

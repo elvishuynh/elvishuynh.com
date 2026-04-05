@@ -25,6 +25,8 @@ export type StreamGraphProps = {
     showControls?: boolean;
     id?: string;
     enableScrollInteraction?: boolean;
+    topStretchMultiplier?: number;
+    color?: string;
 };
 
 // Sub-component for individual layers to handle animation hooks correctly
@@ -56,7 +58,9 @@ export default function Streamgraph({
     loop = false,
     showControls = true,
     id = "streamgraph",
-    enableScrollInteraction = false
+    enableScrollInteraction = false,
+    topStretchMultiplier = 1.0,
+    color = "white"
 }: StreamGraphProps) {
     const [tick, setTick] = useState(0);
 
@@ -67,7 +71,7 @@ export default function Streamgraph({
 
     // ADJUSTMENT: Restored layers and bumps to near-original values to fix "thin" look.
     // Optimization relies primarily on reduced SAMPLES_PER_LAYER.
-    const NUM_LAYERS = isSmall ? 5 : 20; // Was 6. Increased to 15 to restore color density.
+    const NUM_LAYERS = isSmall ? 1 : 1; // Reduced drastically for a simpler look
     const SAMPLES_PER_LAYER = isSmall ? 40 : 200; // Was 40. Slight bump for smoothness, still 3x opt.
     const BUMPS_PER_LAYER = isSmall ? 25 : 10; // Was 3. Restored to 10 so the total height/volume matches original.
 
@@ -81,12 +85,12 @@ export default function Streamgraph({
 
     const colorScale = useMemo(() => scaleOrdinal<number, string>({
         domain: keys,
-        range: ['#ffc409', '#f14702', '#262d97', 'white', '#036ecd', '#9ecadd', '#51666e'],
-    }), [keys]);
+        range: [color], // Use the color prop
+    }), [keys, color]);
 
     const patternScale = useMemo(() => scaleOrdinal<number, string>({
         domain: keys,
-        range: ['mustard', 'cherry', 'navy', 'circles', 'circles', 'circles', 'circles'],
+        range: ['transparent'], // Remove colorful SVG patterns
     }), [keys]);
 
     // Create scales inside component to avoid shared state issues
@@ -101,9 +105,22 @@ export default function Streamgraph({
         range: [height, 0]
     }), [height]);
 
+    // The visual volume is proportional to the number of layers. 
+    // To ensure the streamgraph still gets as high even if NUM_LAYERS is reduced,
+    // we compensate by multiplying the values based on a baseline expectation of 3 (small) or 5 (large) layers.
+    const LAYER_COMPENSATION = (isSmall ? 3 : 5) / Math.max(1, NUM_LAYERS);
+
     // Accessors
-    const getY0 = (d: number[]) => yScale(d[0]) ?? 0;
-    const getY1 = (d: number[]) => yScale(d[1]) ?? 0;
+    const getY0 = (d: number[]) => {
+        let val = d[0] * LAYER_COMPENSATION;
+        if (val > 0) val *= topStretchMultiplier;
+        return yScale(val) ?? 0;
+    };
+    const getY1 = (d: number[]) => {
+        let val = d[1] * LAYER_COMPENSATION;
+        if (val > 0) val *= topStretchMultiplier;
+        return yScale(val) ?? 0;
+    };
 
     // Animation loop
     useEffect(() => {
@@ -173,9 +190,22 @@ export default function Streamgraph({
         // This ensures that scrolling to the same position always yields the same shape
         const rawLayers = dataPool[tick % dataPool.length];
 
-        // Apply multiplier
+        // Apply multiplier and boundary fall-off
         const scaledLayers = rawLayers.map(layer =>
-            layer.map(val => val * multiplier)
+            layer.map((val, i) => {
+                // Use a Tukey window to smoothly taper the edges to exactly zero
+                const x = i / (SAMPLES_PER_LAYER - 1);
+                const alpha = 0.5; // Taper occurs on the outer 25% of both sides
+                let envelope = 1.0;
+
+                if (x < alpha / 2) {
+                    envelope = 0.5 * (1 + Math.cos(Math.PI * (2 * x / alpha - 1)));
+                } else if (x > 1 - alpha / 2) {
+                    envelope = 0.5 * (1 + Math.cos(Math.PI * (2 * (1 - x) / alpha - 1)));
+                }
+
+                return val * multiplier * envelope;
+            })
         );
 
         return transpose<number>(scaledLayers);
