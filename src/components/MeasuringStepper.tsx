@@ -161,13 +161,15 @@ export default function MeasuringStepper() {
                                             width: `${tickWidth}px`,
                                             height: `${tickHeight}px`,
                                             background: "white",
-                                            opacity: 0.9,
+                                            opacity: 1,
                                         }}
                                     />
                                 );
                             }
 
-                            // Non-boundary ticks: inline transform is fine, never animated
+                            // Non-boundary ticks: use margin centering (not transform)
+                            // to stay in the same compositing layer as the parent,
+                            // ensuring mix-blend-mode: difference applies correctly.
                             return (
                                 <div
                                     key={i}
@@ -175,7 +177,8 @@ export default function MeasuringStepper() {
                                     style={{
                                         left: `${progress * 100}%`,
                                         top: "50%",
-                                        transform: "translate(-50%, -50%)",
+                                        marginTop: `${-tickHeight / 2}px`,
+                                        marginLeft: `${-tickWidth / 2}px`,
                                         width: `${tickWidth}px`,
                                         height: `${tickHeight}px`,
                                         background: "white",

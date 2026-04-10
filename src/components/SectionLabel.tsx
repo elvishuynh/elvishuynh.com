@@ -6,28 +6,31 @@ import gsap from "gsap";
 // ── Section metadata ────────────────────────────────────────────────
 // Mirrors the section order defined in page.tsx
 const SECTIONS = [
-    { id: "hero", label: "REEL" },
-    { id: "video-section", label: "FILM" },
-    { id: "vertical-videos", label: "WORK" },
+    { id: "hero", label: "HOME" },
+    { id: "video-section", label: "DEMO REEL" },
+    { id: "vertical-videos", label: "VERTICALS" },
     { id: "dashboard", label: "ABOUT" },
 ];
 
 export default function SectionLabel() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const wrapperRef = useRef<HTMLDivElement>(null);
     const currentRef = useRef<HTMLSpanElement>(null);
     const nextRef = useRef<HTMLSpanElement>(null);
     const activeSectionRef = useRef<number>(0);
     const isAnimatingRef = useRef<boolean>(false);
+    const timelineRef = useRef<gsap.core.Timeline | null>(null);
 
     useEffect(() => {
-        if (!currentRef.current || !nextRef.current) return;
+        if (!currentRef.current || !nextRef.current || !wrapperRef.current) return;
 
         // Initialize labels
         currentRef.current.textContent = SECTIONS[0].label;
-        nextRef.current.textContent = SECTIONS[1]?.label ?? "";
+        nextRef.current.textContent = "";
 
-        // Position next label below (ready to scroll up)
-        gsap.set(nextRef.current, { yPercent: 100, opacity: 0 });
+        // Position both at their resting states
+        gsap.set(currentRef.current, { y: 0 });
+        gsap.set(nextRef.current, { y: 0 });
 
         const tickerFn = () => {
             if (isAnimatingRef.current) return;
@@ -56,49 +59,65 @@ export default function SectionLabel() {
         };
 
         const animateTransition = (newIndex: number, direction: number) => {
-            if (!currentRef.current || !nextRef.current) return;
+            if (!currentRef.current || !nextRef.current || !wrapperRef.current) return;
             isAnimatingRef.current = true;
+
+            // Kill any in-progress transition to prevent overlap
+            if (timelineRef.current) {
+                timelineRef.current.kill();
+            }
 
             const current = currentRef.current;
             const next = nextRef.current;
 
-            // Set the incoming label text
+            // Use the wrapper's actual pixel height so the text fully
+            // exits the overflow:hidden clip area — yPercent was only
+            // moving by the span's own height (~1em) inside a 2em container,
+            // leaving text partially visible and causing the "snap" effect.
+            const clipH = wrapperRef.current.offsetHeight;
+
+            // Set the incoming label text BEFORE positioning so layout is computed
             next.textContent = SECTIONS[newIndex].label;
 
-            // Position next label: below if scrolling forward, above if backward
-            gsap.set(next, {
-                yPercent: direction * 100,
-                opacity: 0,
-            });
+            // Force a synchronous layout reflow so the browser finishes text
+            // layout (including letter-spacing) before the first animation frame.
+            // This prevents the "WOR" -> "WORK" clipping glitch.
+            next.getBoundingClientRect();
+
+            // Position next label fully outside the clip: below if forward, above if backward
+            gsap.set(next, { y: direction * clipH });
 
             const tl = gsap.timeline({
                 onComplete: () => {
-                    // Swap: next becomes current position, current hides
-                    gsap.set(current, { yPercent: 0, opacity: 1 });
+                    // Copy the final text to "current" and swap positions
+                    // in a single synchronous block — no visible change.
                     current.textContent = SECTIONS[newIndex].label;
-                    gsap.set(next, { yPercent: 100, opacity: 0 });
+                    gsap.set(current, { y: 0, immediateRender: true });
+                    gsap.set(next, { y: clipH, immediateRender: true });
+
+                    timelineRef.current = null;
                     isAnimatingRef.current = false;
                 },
             });
 
-            // Animate current label out (scroll up if forward, down if backward)
+            timelineRef.current = tl;
+
+            // Animate current label fully out of the clip area
             tl.to(
                 current,
                 {
-                    yPercent: -direction * 100,
-                    opacity: 0,
+                    y: -direction * clipH,
                     duration: 0.5,
                     ease: "power2.inOut",
                 },
                 0
             );
 
-            // Animate next label in
+            // Animate next label into view (y: 0 = vertically centered via flexbox)
             tl.to(
                 next,
                 {
-                    yPercent: 0,
-                    opacity: 1,
+                    y: 0,
                     duration: 0.5,
                     ease: "power2.inOut",
                 },
@@ -109,6 +128,9 @@ export default function SectionLabel() {
         gsap.ticker.add(tickerFn);
         return () => {
             gsap.ticker.remove(tickerFn);
+            if (timelineRef.current) {
+                timelineRef.current.kill();
+            }
         };
     }, []);
 
@@ -125,12 +147,17 @@ export default function SectionLabel() {
                 overflow: "hidden",
             }}
         >
+            {/* The inner wrapper clips the sliding text. Its pixel height
+                is read at animation time so `y` translations fully push
+                text outside the visible area — no partial visibility. */}
             <div
+                ref={wrapperRef}
                 className="relative"
                 style={{
                     overflow: "hidden",
                     height: "2em",
-                    display: "flex",
+                    minWidth: "12ch",
+                    display: "grid",
                     alignItems: "center",
                 }}
             >
@@ -138,23 +165,24 @@ export default function SectionLabel() {
                     ref={currentRef}
                     className="fl-text-lg/2xl font-bold tracking-widest"
                     style={{
+                        gridArea: "1 / 1",
                         color: "white",
                         display: "block",
                         lineHeight: 1,
                         whiteSpace: "nowrap",
+                        willChange: "transform",
                     }}
                 />
                 <span
                     ref={nextRef}
                     className="fl-text-lg/2xl font-bold tracking-widest"
                     style={{
+                        gridArea: "1 / 1",
                         color: "white",
                         display: "block",
                         lineHeight: 1,
                         whiteSpace: "nowrap",
-                        position: "absolute",
-                        left: 0,
-                        top: 0,
+                        willChange: "transform",
                     }}
                 />
             </div>
