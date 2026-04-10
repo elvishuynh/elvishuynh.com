@@ -3,7 +3,7 @@
 
 @theme {
     --color-background: #e8e6df;
-    --color-foreground: #1d252d;
+    --color-foreground: #1c1917;
 
     --color-grey: #b1b3b3;
 
@@ -23,8 +23,10 @@
 
 /* Hide Scrollbars */
 body {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
 }
 
 body::-webkit-scrollbar {

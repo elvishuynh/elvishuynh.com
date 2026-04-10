@@ -42,7 +42,7 @@ const FlippableActivityCard = () => {
 
     return (
         // 1. The Stage (Parent)
-        <div className="scene col-span-1 row-span-2 h-full" style={{ perspective: '1500px' }}>
+        <div className="scene col-span-1 h-full min-h-[220px]" style={{ perspective: '1500px' }}>
 
             {/* 2. The Rotator (Child) */}
             <div
@@ -53,7 +53,7 @@ const FlippableActivityCard = () => {
             >
                 {/* === FRONT FACE === */}
                 <div
-                    className="face front absolute inset-0 rounded-3xl bg-background border border-gray-200 shadow-xl"
+                    className="face front absolute inset-0 rounded-3xl bg-transparent border border-white shadow-xl"
                     style={{
                         backfaceVisibility: 'hidden',
                         WebkitBackfaceVisibility: 'hidden',
@@ -80,15 +80,15 @@ const FlippableActivityCard = () => {
                         </div>
 
                         {/* Text Content */}
-                        <div className="mt-6 text-center">
-                            <h3 className="text-3xl font-bold text-foreground mb-1">Elvis Huynh</h3>
-                            <p className="text-gray-500 font-medium">Creative Director</p>
+                        <div className="mt-6 text-center font-sans text-white">
+                            <h3 className="text-3xl font-bold mb-1">Elvis Huynh</h3>
+                            <p className="font-medium opacity-80">Creative Director</p>
                         </div>
 
                         {/* Button (Pointer events re-enabled) */}
                         <button
                             onClick={(e) => { e.stopPropagation(); handleFlip(); }}
-                            className="w-full mt-8 py-3 rounded-full bg-black text-white text-sm font-bold hover:bg-gray-800 transition-colors pointer-events-auto shadow-lg"
+                            className="w-full mt-8 py-3 rounded-full bg-white text-black text-sm font-bold hover:bg-gray-200 transition-colors pointer-events-auto border border-white shadow-lg"
                         >
                             Flip me
                         </button>
@@ -97,7 +97,7 @@ const FlippableActivityCard = () => {
 
                 {/* === BACK FACE === */}
                 <div
-                    className="face back absolute inset-0 rounded-3xl bg-background shadow-xl border border-gray-200"
+                    className="face back absolute inset-0 rounded-3xl bg-transparent shadow-xl border border-white"
                     style={{
                         backfaceVisibility: 'hidden',
                         WebkitBackfaceVisibility: 'hidden',
@@ -133,9 +133,9 @@ const FlippableActivityCard = () => {
                         </div>
 
                         {/* Text Content */}
-                        <div className="mt-6 text-center">
-                            <h3 className="text-3xl font-bold text-foreground mb-1">GOAL</h3>
-                            <p className="text-gray-500 text-sm">
+                        <div className="mt-6 text-center font-sans text-white">
+                            <h3 className="text-3xl font-bold mb-1">GOAL</h3>
+                            <p className="text-sm opacity-80">
                                 Increase user engagement by 25% Q3
                             </p>
                         </div>
@@ -143,7 +143,7 @@ const FlippableActivityCard = () => {
                         {/* Button (Pointer events re-enabled) */}
                         <button
                             onClick={(e) => { e.stopPropagation(); handleFlip(); }}
-                            className="w-full mt-8 py-3 rounded-full bg-black text-white text-sm font-bold hover:bg-gray-800 transition-colors pointer-events-auto shadow-lg"
+                            className="w-full mt-8 py-3 rounded-full bg-white text-black text-sm font-bold hover:bg-gray-200 transition-colors pointer-events-auto border border-white shadow-lg"
                         >
                             Flip me
                         </button>
