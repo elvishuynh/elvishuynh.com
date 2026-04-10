@@ -21,12 +21,14 @@ export default function Navbar() {
     const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         gsap.registerPlugin(ScrollToPlugin);
+        window.dispatchEvent(new CustomEvent("navJump", { detail: { targetIndex: 0 } }));
         gsap.to(window, { scrollTo: { x: "#hero" }, duration: 1, ease: "power2.out" });
     };
 
     const handleAboutClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         gsap.registerPlugin(ScrollToPlugin);
+        window.dispatchEvent(new CustomEvent("navJump", { detail: { targetIndex: 3 } }));
         gsap.to(window, { scrollTo: { x: "#dashboard" }, duration: 1, ease: "power2.out" });
     };
 

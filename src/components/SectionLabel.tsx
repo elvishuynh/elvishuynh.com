@@ -18,8 +18,8 @@ export default function SectionLabel() {
     const currentRef = useRef<HTMLSpanElement>(null);
     const nextRef = useRef<HTMLSpanElement>(null);
     const activeSectionRef = useRef<number>(0);
-    const isAnimatingRef = useRef<boolean>(false);
     const timelineRef = useRef<gsap.core.Timeline | null>(null);
+    const jumpingTargetRef = useRef<number | null>(null);
 
     useEffect(() => {
         if (!currentRef.current || !nextRef.current || !wrapperRef.current) return;
@@ -32,105 +32,87 @@ export default function SectionLabel() {
         gsap.set(currentRef.current, { y: 0 });
         gsap.set(nextRef.current, { y: 0 });
 
-        const tickerFn = () => {
-            if (isAnimatingRef.current) return;
-
-            const maxScroll =
-                document.documentElement.scrollWidth - window.innerWidth;
-            if (maxScroll <= 0) return;
-
-            const progress = window.scrollX / maxScroll;
-
-            // Determine active section (0-based) from scroll progress
-            const sectionCount = SECTIONS.length;
-            const rawIndex = progress * (sectionCount - 1);
-            const newSection = Math.round(rawIndex);
-            const clampedSection = Math.min(
-                Math.max(newSection, 0),
-                sectionCount - 1
-            );
-
-            if (clampedSection !== activeSectionRef.current) {
-                const direction =
-                    clampedSection > activeSectionRef.current ? 1 : -1;
-                activeSectionRef.current = clampedSection;
-                animateTransition(clampedSection, direction);
-            }
-        };
-
         const animateTransition = (newIndex: number, direction: number) => {
             if (!currentRef.current || !nextRef.current || !wrapperRef.current) return;
-            isAnimatingRef.current = true;
 
-            // Kill any in-progress transition to prevent overlap
+            // Kill any in-progress transition so we don't overlap tweens
             if (timelineRef.current) {
                 timelineRef.current.kill();
             }
 
             const current = currentRef.current;
             const next = nextRef.current;
+            const clipH = wrapperRef.current.offsetHeight || 40;
 
-            // Use the wrapper's actual pixel height so the text fully
-            // exits the overflow:hidden clip area — yPercent was only
-            // moving by the span's own height (~1em) inside a 2em container,
-            // leaving text partially visible and causing the "snap" effect.
-            const clipH = wrapperRef.current.offsetHeight;
-
-            // Set the incoming label text BEFORE positioning so layout is computed
+            // Set incoming text BEFORE positioning to allow DOM layout evaluation
             next.textContent = SECTIONS[newIndex].label;
+            next.getBoundingClientRect(); // trigger reflow to prevent character popping
 
-            // Force a synchronous layout reflow so the browser finishes text
-            // layout (including letter-spacing) before the first animation frame.
-            // This prevents the "WOR" -> "WORK" clipping glitch.
-            next.getBoundingClientRect();
-
-            // Position next label fully outside the clip: below if forward, above if backward
+            // Position next label fully outside the clip mask
             gsap.set(next, { y: direction * clipH });
 
             const tl = gsap.timeline({
                 onComplete: () => {
-                    // Copy the final text to "current" and swap positions
-                    // in a single synchronous block — no visible change.
+                    // Synchronously swap text and reset coordinates to eliminate the visual snap
                     current.textContent = SECTIONS[newIndex].label;
                     gsap.set(current, { y: 0, immediateRender: true });
                     gsap.set(next, { y: clipH, immediateRender: true });
-
                     timelineRef.current = null;
-                    isAnimatingRef.current = false;
                 },
             });
 
             timelineRef.current = tl;
 
-            // Animate current label fully out of the clip area
-            tl.to(
-                current,
-                {
-                    y: -direction * clipH,
-                    duration: 0.5,
-                    ease: "power2.inOut",
-                },
-                0
-            );
+            tl.to(current, { y: -direction * clipH, duration: 0.5, ease: "power2.inOut" }, 0);
+            tl.to(next, { y: 0, duration: 0.5, ease: "power2.inOut" }, 0);
+        };
 
-            // Animate next label into view (y: 0 = vertically centered via flexbox)
-            tl.to(
-                next,
-                {
-                    y: 0,
-                    duration: 0.5,
-                    ease: "power2.inOut",
-                },
-                0
-            );
+        const handleNavJump = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            const targetIndex = customEvent.detail.targetIndex;
+            if (targetIndex !== activeSectionRef.current) {
+                // Compute direction to the target and trigger the final animation immediately
+                const direction = targetIndex > activeSectionRef.current ? 1 : -1;
+                jumpingTargetRef.current = targetIndex; // Lock out normal scroll triggers
+                activeSectionRef.current = targetIndex;
+                animateTransition(targetIndex, direction);
+            }
+        };
+
+        window.addEventListener("navJump", handleNavJump);
+
+        const tickerFn = () => {
+            const maxScroll = document.documentElement.scrollWidth - window.innerWidth;
+            if (maxScroll <= 0) return;
+
+            const progress = window.scrollX / maxScroll;
+            const sectionCount = SECTIONS.length;
+            const rawIndex = progress * (sectionCount - 1);
+            const clampedSection = Math.min(Math.max(Math.round(rawIndex), 0), sectionCount - 1);
+
+            // If we are currently locked into a Navbar multi-section jump...
+            if (jumpingTargetRef.current !== null) {
+                // Unlock only when the scroll coordinates naturally cross the destination,
+                // freeing it to react to regular small mousewheel scrolls again.
+                if (Math.abs(rawIndex - jumpingTargetRef.current) < 0.1) {
+                    jumpingTargetRef.current = null;
+                } else {
+                    return; // Crucial: ignore rapid intermediate section crossings
+                }
+            }
+
+            if (clampedSection !== activeSectionRef.current) {
+                const direction = clampedSection > activeSectionRef.current ? 1 : -1;
+                activeSectionRef.current = clampedSection;
+                animateTransition(clampedSection, direction);
+            }
         };
 
         gsap.ticker.add(tickerFn);
         return () => {
             gsap.ticker.remove(tickerFn);
-            if (timelineRef.current) {
-                timelineRef.current.kill();
-            }
+            if (timelineRef.current) timelineRef.current.kill();
+            window.removeEventListener("navJump", handleNavJump);
         };
     }, []);
 
@@ -147,9 +129,6 @@ export default function SectionLabel() {
                 overflow: "hidden",
             }}
         >
-            {/* The inner wrapper clips the sliding text. Its pixel height
-                is read at animation time so `y` translations fully push
-                text outside the visible area — no partial visibility. */}
             <div
                 ref={wrapperRef}
                 className="relative"
