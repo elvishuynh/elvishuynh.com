@@ -54,10 +54,7 @@ export default function Navbar() {
                         <Link href="#dashboard" onClick={handleAboutClick} className="fl-text-base/xl font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                             About
                         </Link>
-                        <Link
-                            href="/"
-                            className="inline-flex items-center justify-center whitespace-nowrap px-5 py-2 rounded-full bg-black text-white fl-text-sm/base font-medium hover:bg-gray-800 transition-colors dark:bg-white dark:text-black dark:hover:bg-gray-200"
-                        >
+                        <Link href="/" className="fl-text-base/xl font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                             Contact
                         </Link>
                     </div>
