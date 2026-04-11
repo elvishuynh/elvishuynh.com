@@ -76,15 +76,16 @@ const FlippableActivityCard = () => {
     }, []);
 
     const handleFlip = () => {
-        if (!cardRef.current || !tl.current) return;
+        const timeline = tl.current;
+        if (!cardRef.current || !timeline) return;
 
         setIsFlipped((prev) => {
             const nextState = !prev;
             // Centralized Symmetric Controller:
             // Scrubbing the timeline's playhead with specialized physics 
             // Ensures fast starts and smooth settlements in BOTH directions.
-            gsap.to(tl.current, {
-                time: nextState ? tl.current.duration() : 0,
+            gsap.to(timeline, {
+                time: nextState ? timeline.duration() : 0,
                 duration: 1.8,
                 ease: "power4.out",
                 overwrite: true
