@@ -372,9 +372,8 @@ const Dashboard = () => {
                     </div>
 
                     {/* Large Card - Graph Placeholder */}
-                    <div className="col-span-1 md:col-span-2 lg:col-span-2 flex flex-col">
-                        <div className="group flex-1 relative bg-transparent p-4 sm:p-5 border border-white flex flex-col font-sans transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/20 lg:min-h-[220px]">
-                            <div className="absolute top-0 right-0 -mt-4 -mr-4 h-32 w-32 rounded-full bg-orange-500/10 blur-3xl transition-all duration-500 group-hover:bg-orange-500/20"></div>
+                    <div className="group col-span-1 md:col-span-2 lg:col-span-2 relative bg-transparent p-4 sm:p-5 border border-white flex flex-col font-sans transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/20 lg:min-h-[220px]">
+                        <div className="absolute top-0 right-0 -mt-4 -mr-4 h-32 w-32 rounded-full bg-orange-500/10 blur-3xl transition-all duration-500 group-hover:bg-orange-500/20"></div>
 
                             <div className="relative z-10 flex flex-col h-full text-white">
                                 <h2 className="text-4xl font-black tracking-tighter leading-none mb-1">RETAINER MODEL*</h2>
@@ -429,21 +428,22 @@ const Dashboard = () => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col text-[9px] sm:text-[10px] text-white/60 font-sans leading-tight text-left mt-1.5 px-0.5">
-                            <div className="flex items-start">
-                                <span>Note: All metrics are derived from Meta Business Suite and represent Instagram platform analytics.</span>
-                                <span className="w-2.5 shrink-0">¹</span>
-                                <span>A period is defined as a specific fixed duration of time used as a benchmark to compare current performance against baseline data.</span>
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Activity Feed */}
                     <FlippableActivityCard />
 
 
 
                 </div>
+                
+                {/* Global Dashboard Note */}
+                <div className="flex flex-col text-[9px] sm:text-[10px] text-white/60 font-sans leading-tight text-left mt-3 sm:mt-4 px-1">
+                    <div className="flex items-start">
+                        <span>Note: All metrics are derived from Meta Business Suite and represent Instagram platform analytics.</span>
+                        <span className="w-2.5 shrink-0 mx-1">¹</span>
+                        <span>A period is defined as a specific fixed duration of time used as a benchmark to compare current performance against baseline data.</span>
+                    </div>
+                </div>
+
             </div>
         </section>
     );
